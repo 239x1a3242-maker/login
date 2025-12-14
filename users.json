@@ -1,0 +1,17 @@
+[
+    {
+        "name": "Ashok",
+        "email": "e2541502@gmail.com",
+        "password": "$pbkdf2-sha256$29000$wvh/bw3BOAeA0HrPWcv5fw$gK8I0NgV7EG5TYjg81yDMeLW50Nxqlkq/R3Y498qMQg"
+    },
+    {
+        "name": "Khaja",
+        "email": "a8897490597@gmail.com",
+        "password": "$pbkdf2-sha256$29000$vNe6l9JaS2mtFQJgbE2plQ$NTBqBAuRYnE08lg3f44mJMgHlH68xcJYrRIdOlDFS3s"
+    },
+    {
+        "name": "vijay",
+        "email": "gajjalaashok75@gmail.com",
+        "password": "$pbkdf2-sha256$29000$PEdozbm31nqvNQag1BpDyA$zIVo5T8QuyZgYQp9wdw5inS1zBYaji0Z3yIS.laWIQA"
+    }
+]
