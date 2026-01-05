@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAKR AI - Profile</title>
+    <script>
+        // Immediate check for login status
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = '/auth';
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /*
+        ========================================
+        Base & Layout Styles
+        ========================================
+        */
+        :root {
+            --gakr-blue: #007bff; /* A vibrant blue for accents */
+            --gakr-blue-dark: #0056b3; /* Darker shade for hover/active states */
+            --gakr-blue-light: #e0f0ff; /* Lighter shade for selected states */
+            --gakr-blue-rgb: 0, 123, 255; /* RGB for translucent backgrounds */
+
+            /* Dark theme specifics (from replit's bootstrap-agent-dark-theme.min.css for consistency) */
+            --bs-body-bg: #1a1a1a; /* Dark background */
+            --bs-body-color: #f0f0f0; /* Light text */
+            --bs-primary: var(--gakr-blue);
+            --bs-secondary: #6c757d;
+            --bs-secondary-bg: #2a2a2a; /* Slightly lighter dark background */
+            --bs-tertiary-bg: #3a3a3a; /* Even lighter dark background for elements */
+            --bs-border-color: #4a4a4a; /* Border color */
+            --bs-link-color: var(--gakr-blue);
+            --bs-link-hover-color: var(--gakr-blue-dark);
+            --bs-heading-color: #f8f9fa; /* Lighter headings */
+            --bs-tertiary-color: #adb5bd; /* For less prominent text */
+            --bs-success: #28a745;
+            --bs-info: #17a2b8;
+            --bs-warning: #ffc107;
+            --bs-danger: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            margin: 0;
+            padding-top: 64px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .gakr-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 1200px; /* Max width for content */
+            margin: 0 auto; /* Center the layout */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+            background-color: var(--bs-body-bg); /* Ensure content area matches body bg */
+        }
+
+        /*
+        ========================================
+        Header Styles
+        ========================================
+        */
+        .gakr-chat-header {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bs-border-color);
+            height: 64px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background-color: var(--bs-body-bg);
+            z-index: 10;
+        }
+
+        .gakr-logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .gakr-brand-logo {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gakr-brand-text {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--gakr-blue);
+        }
+
+        .gakr-nav-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .gakr-login-button {
+            color: var(--gakr-blue);
+            text-decoration: none;
+            background: transparent;
+            border: 1px solid var(--gakr-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .gakr-login-button:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+
+        .gakr-profile-button {
+            color: var(--gakr-blue);
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gakr-profile-button:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+
+        /*
+        ========================================
+        Profile Button & Dropdown
+        ========================================
+        */
+        .profile-nav-controls {
+            position: relative;
+            z-index: 1001; /* Ensure dropdown is above other content */
+        }
+
+        .profile-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--gakr-blue);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-button:hover {
+            background-color: var(--gakr-blue-dark);
+        }
+
+        .profile-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background-color: var(--bs-tertiary-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+            padding: 0.5rem 0;
+            z-index: 100;
+        }
+
+        .profile-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .profile-dropdown-item {
+            display: block;
+            padding: 0.8rem 1.2rem;
+            color: var(--bs-body-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .profile-dropdown-item:hover {
+            background-color: var(--bs-secondary-bg);
+            color: var(--gakr-blue);
+        }
+
+        /*
+        ========================================
+        Profile View Specific Styles
+        ========================================
+        */
+        .profile-view {
+            flex-grow: 1;
+            padding: 2rem;
+            background-color: var(--bs-body-bg); /* Main content background */
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .profile-header-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+
+        .profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--gakr-blue);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            border: 4px solid var(--bs-tertiary-bg);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative; /* For the edit icon */
+            overflow: hidden; /* To clip avatar images */
+        }
+
+        .profile-avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .profile-avatar-edit-icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: var(--bs-tertiary-bg);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.2s ease;
+            color: var(--bs-body-color);
+        }
+
+        .profile-avatar-edit-icon:hover {
+            background-color: var(--bs-secondary-bg);
+            color: var(--gakr-blue);
+        }
+
+        .profile-username-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-username {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--bs-heading-color);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .username-edit-icon, .section-edit-icon {
+            color: var(--bs-secondary-color);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: color 0.2s ease;
+        }
+
+        .username-edit-icon:hover, .section-edit-icon:hover {
+            color: var(--gakr-blue);
+        }
+
+        .username-input-container {
+            display: none; /* Hidden by default, toggled by JS */
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .username-edit-input {
+            flex-grow: 1;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--bs-border-color);
+            background-color: var(--bs-secondary-bg);
+            color: var(--bs-body-color);
+            font-size: 1.1rem;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .username-edit-input::placeholder {
+            color: var(--bs-tertiary-color);
+        }
+        .username-edit-input:focus {
+            border-color: var(--gakr-blue);
+            box-shadow: 0 0 0 0.25rem rgba(var(--gakr-blue-rgb), 0.25);
+        }
+
+
+        .username-save-button {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            background-color: var(--gakr-blue);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .username-save-button:hover {
+            background-color: var(--gakr-blue-dark);
+        }
+
+        .profile-email {
+            font-size: 1.1rem;
+            color: var(--bs-secondary-color);
+            margin: 0;
+        }
+
+        .profile-section {
+            background-color: var(--bs-secondary-bg);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .profile-section-title {
+            font-size: 1.6rem;
+            color: var(--bs-heading-color);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--bs-border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .profile-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--bs-border-color);
+        }
+        .profile-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-info-label {
+            font-weight: 500;
+            color: var(--bs-tertiary-color);
+            flex-basis: 30%; /* Adjust as needed */
+        }
+
+        .profile-info-value {
+            color: var(--bs-body-color);
+            text-align: right;
+            flex-basis: 70%; /* Adjust as needed */
+        }
+
+        /* About Me specific styles */
+        .profile-about-me-display {
+            color: var(--bs-body-color);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 80px;
+            overflow-y: auto;
+        }
+        .profile-about-me-display.placeholder {
+            color: var(--bs-tertiary-color);
+            font-style: italic;
+        }
+
+        .about-me-edit-icon {
+            margin-left: auto; /* Push icon to the right if title is flex */
+        }
+
+        .about-me-input-container {
+            display: none; /* Hidden by default */
+            flex-direction: column; /* Stack textarea and button */
+            gap: 0.75rem;
+        }
+
+        .about-me-edit-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--bs-border-color);
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            font-size: 1rem;
+            min-height: 120px;
+            resize: vertical;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .about-me-edit-textarea::placeholder {
+            color: var(--bs-tertiary-color);
+        }
+        .about-me-edit-textarea:focus {
+            border-color: var(--gakr-blue);
+            box-shadow: 0 0 0 0.25rem rgba(var(--gakr-blue-rgb), 0.25);
+        }
+
+        .about-me-save-button {
+            align-self: flex-end; /* Align to the right */
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            background-color: var(--gakr-blue);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .about-me-save-button:hover {
+            background-color: var(--gakr-blue-dark);
+        }
+
+        /* Chat History Styles */
+        .profile-chat-history {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-history-item {
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative; /* For context menu positioning */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-history-item:hover {
+            background-color: var(--bs-secondary-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-history-item .chat-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .chat-history-item .chat-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--bs-heading-color);
+            flex-grow: 1; /* Allows title to take available space */
+        }
+
+        .chat-history-item .chat-meta {
+            font-size: 0.85rem;
+            color: var(--bs-secondary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-chat-history {
+            text-align: center;
+            color: var(--bs-tertiary-color);
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        /* Profile Buttons Area */
+        .profile-buttons-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--bs-border-color);
+        }
+
+        .gakr-button-primary, .gakr-button-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .gakr-button-primary {
+            background-color: var(--gakr-blue);
+            color: white;
+            border: 1px solid var(--gakr-blue);
+        }
+
+        .gakr-button-primary:hover {
+            background-color: var(--gakr-blue-dark);
+            border-color: var(--gakr-blue-dark);
+            color: white;
+        }
+
+        .gakr-button-secondary {
+            background-color: transparent;
+            color: var(--gakr-blue);
+            border: 1px solid var(--gakr-blue);
+        }
+
+        .gakr-button-secondary:hover {
+            background-color: var(--gakr-blue-light);
+            color: var(--gakr-blue-dark);
+            border-color: var(--gakr-blue-dark);
+        }
+
+        .me-2 { /* Margin End (right) */
+            margin-right: 0.5rem;
+        }
+
+        /*
+        ========================================
+        Footer Styles
+        ========================================
+        */
+        .gakr-footer {
+            padding: 1rem 1.5rem;
+            background-color: var(--bs-tertiary-bg);
+            border-top: 1px solid var(--bs-border-color);
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--bs-secondary-color);
+            margin-top: auto; /* Push footer to the bottom */
+        }
+
+        /*
+        ========================================
+        Toast Notification Styles
+        ========================================
+        */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 2000; /* Above all other content */
+        }
+
+        .gakr-toast {
+            background-color: var(--bs-tertiary-bg);
+            color: var(--bs-body-color);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 250px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            border: 1px solid var(--bs-border-color);
+        }
+
+        .gakr-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gakr-toast.hide {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .gakr-toast .toast-icon {
+            font-size: 1.2rem;
+        }
+
+        .gakr-toast.success {
+            border-left: 5px solid var(--bs-success);
+        }
+        .gakr-toast.success .toast-icon {
+            color: var(--bs-success);
+        }
+
+        .gakr-toast.error {
+            border-left: 5px solid var(--bs-danger);
+        }
+        .gakr-toast.error .toast-icon {
+            color: var(--bs-danger);
+        }
+
+        .gakr-toast.warning {
+            border-left: 5px solid var(--bs-warning);
+        }
+        .gakr-toast.warning .toast-icon {
+            color: var(--bs-warning);
+        }
+
+        .gakr-toast.info {
+            border-left: 5px solid var(--bs-info);
+        }
+        .gakr-toast.info .toast-icon {
+            color: var(--bs-info);
+        }
+
+
+        /*
+        ========================================
+        Custom Modal Styles (Confirm/Prompt)
+        ========================================
+        */
+        .gakr-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent dark overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1500;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .gakr-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .gakr-modal-content {
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            transform: translateY(-20px) scale(0.95);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+
+        .gakr-modal-overlay.show .gakr-modal-content {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        .gakr-modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--bs-heading-color);
+        }
+
+        .gakr-modal-message {
+            font-size: 1rem;
+            color: var(--bs-body-color);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .gakr-modal-input {
+            width: calc(100% - 20px); /* Account for padding */
+            padding: 0.8rem 10px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            background-color: var(--bs-secondary-bg);
+            color: var(--bs-body-color);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .gakr-modal-input:focus {
+            border-color: var(--gakr-blue);
+            box-shadow: 0 0 0 0.2rem rgba(var(--gakr-blue-rgb), 0.25);
+        }
+
+        .gakr-modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .gakr-modal-buttons button {
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+
+        .confirm-ok, .prompt-submit {
+            background-color: var(--gakr-blue);
+            color: white;
+            border: none;
+        }
+
+        .confirm-ok:hover, .prompt-submit:hover {
+            background-color: var(--gakr-blue-dark);
+        }
+
+        .confirm-cancel, .prompt-cancel {
+            background-color: transparent;
+            color: var(--gakr-blue);
+            border: 1px solid var(--gakr-blue);
+        }
+
+        .confirm-cancel:hover, .prompt-cancel:hover {
+            background-color: var(--gakr-blue-light);
+            color: var(--gakr-blue-dark);
+            border-color: var(--gakr-blue-dark);
+        }
+
+        /*
+        ========================================
+        Advanced Features Styles (New)
+        ========================================
+        */
+        .chat-history-item.pinned {
+            background-color: var(--bs-secondary-bg);
+            border-left: 5px solid var(--gakr-blue);
+            padding-left: calc(1rem - 5px); /* Adjust padding due to border */
+        }
+        .pinned-icon {
+            color: var(--gakr-blue);
+            font-size: 0.9em;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .chat-history-item .chat-tags {
+            font-size: 0.8rem;
+            color: var(--bs-secondary-color);
+            margin-top: 0.5rem;
+        }
+        .chat-history-item .chat-tags span {
+            background-color: rgba(var(--gakr-blue-rgb), 0.1);
+            color: var(--gakr-blue);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px; /* Pill shape */
+            margin-right: 0.4rem;
+            display: inline-block;
+            margin-bottom: 0.4rem; /* For multiple lines of tags */
+            white-space: nowrap; /* Prevent tags from breaking */
+        }
+        .chat-history-item .chat-tags span:last-child {
+            margin-right: 0;
+        }
+
+        .chat-history-search-container {
+            position: relative;
+            margin-bottom: 1rem;
+            width: 100%;
+            max-width: 400px; /* Limit search input width */
+            align-self: center; /* Center if flex container */
+        }
+        .chat-history-search-input {
+            width: 100%;
+            padding: 0.6rem 2.5rem 0.6rem 1rem; /* Adjust padding for icon */
+            border-radius: 8px;
+            border: 1px solid var(--bs-border-color);
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .chat-history-search-input:focus {
+            border-color: var(--gakr-blue);
+            box-shadow: 0 0 0 0.25rem rgba(var(--gakr-blue-rgb), 0.25);
+        }
+        .chat-history-search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--bs-secondary-color);
+            pointer-events: none; /* Make icon not interfere with input clicks */
+        }
+
+
+        .chat-history-sort-container {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: flex-end; /* Align to the right */
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--bs-secondary-color);
+        }
+        .chat-history-sort-select {
+            background-color: var(--bs-tertiary-bg);
+            color: var(--bs-body-color);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+            -webkit-appearance: none; /* Remove default arrow */
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f0f0f0'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Csvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1em;
+        }
+        .chat-history-sort-select:focus {
+            border-color: var(--gakr-blue);
+            box-shadow: 0 0 0 0.25rem rgba(var(--gakr-blue-rgb), 0.25);
+        }
+
+        .chat-history-last-active {
+            font-size: 0.75rem;
+            color: var(--bs-tertiary-color);
+            margin-left: auto; /* Push to the right */
+        }
+
+        /* Chat Context Menu */
+        .chat-context-menu {
+            position: fixed; /* Fixed position relative to viewport */
+            background-color: var(--bs-tertiary-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            min-width: 150px;
+            padding: 0.5rem 0;
+            z-index: 1002; /* Above profile dropdown */
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.95);
+            transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+        }
+
+        .chat-context-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        .chat-context-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1.2rem;
+            color: var(--bs-body-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .chat-context-menu-item:hover {
+            background-color: var(--bs-secondary-bg);
+            color: var(--gakr-blue);
+        }
+
+        .chat-context-menu-item i {
+            width: 1.2rem; /* Align icons */
+            text-align: center;
+        }
+
+        /* Tag Selection Modal */
+        .tag-selection-modal-content {
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            text-align: left;
+            transform: translateY(-20px) scale(0.95);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
+        .gakr-modal-overlay.show .tag-selection-modal-content {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        .tag-selection-modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--bs-heading-color);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+        .tag-options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Responsive grid */
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .tag-option {
+            background-color: var(--bs-secondary-bg);
+            color: var(--bs-body-color);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            padding: 0.5rem 0.8rem;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .tag-option:hover {
+            background-color: var(--bs-tertiary-bg);
+            border-color: var(--gakr-blue);
+        }
+        .tag-option.selected {
+            background-color: var(--gakr-blue);
+            color: white;
+            border-color: var(--gakr-blue-dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .tag-option.selected:hover {
+             background-color: var(--gakr-blue-dark);
+             border-color: var(--gakr-blue-dark);
+        }
+        .tag-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--bs-border-color);
+        }
+        .tag-actions button {
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        .tag-actions .confirm-ok {
+            background-color: var(--gakr-blue);
+            color: white;
+            border: none;
+        }
+        .tag-actions .confirm-ok:hover {
+            background-color: var(--gakr-blue-dark);
+        }
+        .tag-actions .confirm-cancel {
+            background-color: transparent;
+            color: var(--gakr-blue);
+            border: 1px solid var(--gakr-blue);
+        }
+        .tag-actions .confirm-cancel:hover {
+            background-color: var(--gakr-blue-light);
+            color: var(--gakr-blue-dark);
+            border-color: var(--gakr-blue-dark);
+        }
+
+
+        /*
+        ========================================
+        Responsive Adjustments (Optional but Recommended)
+        ========================================
+        */
+        @media (max-width: 768px) {
+            .gakr-header {
+                padding: 0.8rem 1rem;
+            }
+            .profile-view {
+                padding: 1rem;
+                gap: 1.5rem;
+            }
+            .profile-header-section {
+                margin-bottom: 1.5rem;
+            }
+            .profile-username {
+                font-size: 1.8rem;
+            }
+            .profile-email {
+                font-size: 1rem;
+            }
+            .profile-section {
+                padding: 1rem 1.2rem;
+            }
+            .profile-section-title {
+                font-size: 1.4rem;
+            }
+            .profile-info-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.2rem;
+            }
+            .profile-info-label {
+                flex-basis: auto;
+                font-size: 0.9rem;
+            }
+            .profile-info-value {
+                flex-basis: auto;
+                text-align: left;
+                font-size: 0.95rem;
+            }
+            .profile-buttons-area {
+                margin-top: 1.5rem;
+                padding-top: 1.5rem;
+            }
+            .gakr-button-primary, .gakr-button-secondary {
+                max-width: none; /* Full width on small screens */
+            }
+            .chat-history-sort-container {
+                justify-content: flex-start; /* Align left on small screens */
+            }
+            .tag-options-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 0.5rem;
+            }
+            .tag-option {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gakr-brand-text {
+                font-size: 1.3rem;
+            }
+            .profile-avatar-large {
+                width: 90px;
+                height: 90px;
+                font-size: 3rem;
+            }
+            .profile-username {
+                font-size: 1.5rem;
+            }
+            .username-edit-input, .username-save-button {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.8rem;
+            }
+            .about-me-edit-textarea, .about-me-save-button {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem;
+            }
+            .chat-history-item {
+                padding: 0.8rem 1rem;
+            }
+            .chat-history-item .chat-title {
+                font-size: 1rem;
+            }
+            .chat-history-item .chat-meta {
+                font-size: 0.75rem;
+            }
+            .chat-history-sort-select {
+                font-size: 0.85rem;
+                padding: 0.2rem 0.5rem;
+            }
+            .gakr-modal-content {
+                padding: 1.5rem;
+            }
+            .gakr-modal-title {
+                font-size: 1.3rem;
+            }
+            .gakr-modal-message {
+                font-size: 0.9rem;
+            }
+            .gakr-modal-buttons button {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body class="on-profile-page">
+    <div class="gakr-layout">
+        <header class="gakr-chat-header">
+            <div class="gakr-logo-area">
+                <a href="/" class="gakr-brand-logo">
+                    <i class="fas fa-robot" style="color: var(--gakr-blue);"></i>
+                </a>
+                <a href="/" class="gakr-brand-text" style="text-decoration: none;">GAKR AI</a>
+            </div>
+
+            <div class="gakr-nav-controls" id="authButtonContainer">
+                <a href="/auth" class="gakr-login-button">Sign in / Register</a>
+            </div>
+        </header>
+
+        <div class="profile-view" id="profileView">
+            <div class="profile-header-section">
+                <div class="profile-avatar-large" id="profileAvatarLarge">
+                    U
+                    <label for="avatarUpload" class="profile-avatar-edit-icon" title="Change Avatar">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                    </label>
+                </div>
+                <div class="profile-username-container">
+                    <h1 class="profile-username" id="profileUsernameDisplay">User Name</h1>
+                    <i class="fas fa-pencil-alt username-edit-icon" id="editUsernameIcon" title="Edit Username"></i>
+                </div>
+                <div class="username-input-container" id="usernameInputContainer">
+                    <input type="text" id="usernameEditInput" class="username-edit-input" placeholder="Enter new username">
+                    <button id="usernameSaveButton" class="username-save-button">Save</button>
+                </div>
+                <p class="profile-email" id="profileEmailDisplay">user.email@example.com</p>
+            </div>
+
+            <div class="profile-section">
+                <h2 class="profile-section-title">Account Information</h2>
+                <div class="profile-info-item">
+                    <span class="profile-info-label">Name:</span>
+                    <span class="profile-info-value" id="accountName">User Name</span>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-info-label">Email:</span>
+                    <span class="profile-info-value" id="accountEmail">user.email@example.com</span>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h2 class="profile-section-title">
+                    About Me
+                    <i class="fas fa-pencil-alt section-edit-icon about-me-edit-icon" id="editAboutMeIcon" title="Edit About Me"></i>
+                </h2>
+                <div class="profile-about-me-display" id="profileAboutMeDisplay">Tell us something about yourself...</div>
+                <div class="about-me-input-container" id="aboutMeInputContainer">
+                    <textarea id="aboutMeEditInput" class="about-me-edit-textarea" placeholder="Write a short bio..."></textarea>
+                    <button id="aboutMeSaveButton" class="about-me-save-button">Save</button>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h2 class="profile-section-title">Recent Conversations</h2>
+                <div class="chat-history-search-container">
+                    <input type="text" id="chatHistorySearchInput" class="chat-history-search-input" placeholder="Search conversations...">
+                    <i class="fas fa-search chat-history-search-icon"></i>
+                </div>
+                <div class="profile-chat-history" id="chatHistoryList">
+                    <p class="empty-chat-history" id="emptyChatHistoryMessage" style="display: none;">No conversations yet. Start chatting with GAKR AI!</p>
+                    </div>
+            </div>
+
+            <div class="profile-buttons-area">
+                <a href="/chat" class="gakr-button-primary" id="startChattingButton">
+                    <i class="fas fa-comments me-2"></i> Start Chatting with GAKR AI
+                </a>
+                <button
+    type="button"
+    class="gakr-button-primary"
+    id="profileSettingsButton">
+    <i class="fas fa-cog me-2"></i> Settings
+</button>
+
+
+                <a href="#" class="gakr-button-secondary" id="profileLogoutButton" onclick="logoutFunction()">
+                    <i class="fas fa-sign-out-alt me-2"></i> Log out
+                </a>
+            </div>
+        </div>
+
+        <footer class="gakr-footer">
+            <div>GAKR AI - Powered by Advanced Local AI</div>
+        </footer>
+
+        <div id="chatContextMenu" class="chat-context-menu">
+            <a href="#" class="chat-context-menu-item" data-action="delete"><i class="fas fa-trash-alt"></i> Delete</a>
+            <a href="#" class="chat-context-menu-item" data-action="share"><i class="fas fa-share-alt"></i> Share</a>
+            <a href="#" class="chat-context-menu-item pin-unpin" data-action="pin"><i class="fas fa-thumbtack"></i> Pin</a>
+            <a href="#" class="chat-context-menu-item" data-action="tag"><i class="fas fa-tag"></i> Add Tag</a>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="gakr-modal-overlay" id="confirmModal">
+        <div class="gakr-modal-content">
+            <h3 class="gakr-modal-title" id="confirmTitle">Confirm Action</h3>
+            <p class="gakr-modal-message" id="confirmMessage">Are you sure you want to proceed?</p>
+            <div class="gakr-modal-buttons">
+                <button class="confirm-cancel" id="confirmCancelButton">Cancel</button>
+                <button class="confirm-ok" id="confirmOkButton">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="gakr-modal-overlay" id="promptModal">
+        <div class="gakr-modal-content">
+            <h3 class="gakr-modal-title" id="promptTitle">Enter Information</h3>
+            <p class="gakr-modal-message" id="promptMessage">Please provide the required input:</p>
+            <input type="text" class="gakr-modal-input" id="promptInput" placeholder="Enter text here...">
+            <div class="gakr-modal-buttons">
+                <button class="prompt-cancel" id="promptCancelButton">Cancel</button>
+                <button class="prompt-submit" id="promptSubmitButton">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="gakr-modal-overlay" id="tagModal">
+        <div class="tag-selection-modal-content">
+            <h3 class="tag-selection-modal-title" id="tagModalTitle">Add Tag to Conversation</h3>
+            <div class="tag-options-grid" id="tagOptions">
+                </div>
+            <div class="tag-actions">
+                <button class="confirm-cancel" id="tagCancelButton">Cancel</button>
+                <button class="confirm-ok" id="tagSaveButton">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global modal elements
+        let confirmModal, confirmTitle, confirmMessage, confirmOkButton, confirmCancelButton;
+
+        // Logout function - defined globally for onclick
+        async function logoutFunction() {
+            const confirmed = await showConfirmDialog('Are you sure you want to log out?', 'Logout Confirmation');
+            if (confirmed) {
+                localStorage.removeItem('isLoggedIn');
+                sessionStorage.clear(); // Clear all session data
+                window.location.href = '/'; // Redirect to home/login immediately
+            }
+        }
+
+        // Custom Confirm Dialog Function (Global)
+        function showConfirmDialog(message, title = 'Confirm Action') {
+            return new Promise((resolve) => {
+                if (!confirmModal) {
+                    // Fallback if modal not loaded yet
+                    const confirmed = window.confirm(message);
+                    resolve(confirmed);
+                    return;
+                }
+
+                confirmTitle.textContent = title;
+                confirmMessage.textContent = message;
+                confirmModal.classList.add('show');
+
+                // Store the element that triggered the modal for focus management
+                const triggeringElement = document.activeElement;
+
+                const handleOk = () => {
+                    confirmModal.classList.remove('show');
+                    confirmOkButton.removeEventListener('click', handleOk);
+                    confirmCancelButton.removeEventListener('click', handleCancel);
+                    if (triggeringElement) triggeringElement.focus(); // Return focus
+                    resolve(true);
+                };
+
+                const handleCancel = () => {
+                    confirmModal.classList.remove('show');
+                    confirmOkButton.removeEventListener('click', handleOk);
+                    confirmCancelButton.removeEventListener('click', handleCancel);
+                    if (triggeringElement) triggeringElement.focus(); // Return focus
+                    resolve(false);
+                };
+
+                confirmOkButton.addEventListener('click', handleOk);
+                confirmCancelButton.addEventListener('click', handleCancel);
+
+                // Close on overlay click (but prevent immediate closing if clicking content)
+                confirmModal.addEventListener('click', function(event) {
+                    if (event.target === confirmModal) { // Only close if click is directly on the overlay
+                        handleCancel();
+                    }
+                }, { once: true }); // Ensure it only runs once per dialog instance
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Authentication Status Check ---
+            function updateAuthButton() {
+                const authButtonContainer = document.getElementById('authButtonContainer');
+                const userIsLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+                if (userIsLoggedIn) {
+                    authButtonContainer.innerHTML = `
+                        <a href="/profile" class="gakr-profile-button">
+                            <i class="fas fa-user-circle me-2"></i>Profile
+                        </a>
+                    `;
+                     const profileButton = authButtonContainer.querySelector('.gakr-profile-button');
+                     if (profileButton) {
+                         profileButton.addEventListener('click', function(event) {
+                             console.log("Profile button clicked!");
+                         });
+                     }
+                } else {
+                    authButtonContainer.innerHTML = `
+                        <a href="/auth" class="gakr-login-button">Sign in / Register</a>
+                    `;
+                }
+            }
+
+            updateAuthButton();
+            window.addEventListener('focus', updateAuthButton);
+            window.addEventListener('storage', updateAuthButton);
+
+            // Check if user is logged in
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = '/auth';
+                return;
+            }
+            // --- DOM Element References ---
+            const profileButton = document.getElementById('profileButton');
+            const profileDropdown = document.getElementById('profileDropdown');
+            const logoutButton = document.getElementById('logoutButton');
+            const brandLogoArea = document.getElementById('brandLogoArea');
+            const signInRegisterButton = document.getElementById('signInRegisterButton');
+            const profileControls = document.getElementById('profileControls');
+
+            // Profile-specific elements
+            const profileAvatarLarge = document.getElementById('profileAvatarLarge');
+            const profileUsernameDisplay = document.getElementById('profileUsernameDisplay');
+            const profileEmailDisplay = document.getElementById('profileEmailDisplay');
+            const accountName = document.getElementById('accountName');
+            const accountEmail = document.getElementById('accountEmail');
+            const chatHistoryList = document.getElementById('chatHistoryList');
+            const profileSettingsButton = document.getElementById('profileSettingsButton');
+            const profileLogoutButton = document.getElementById('profileLogoutButton');
+            const profileLink = document.getElementById('profileLink');
+            const settingsLink = document.getElementById('settingsLink');
+            const emptyChatHistoryMessage = document.getElementById('emptyChatHistoryMessage');
+
+            // Check login
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = '/auth';
+            }
+
+            // Load user data
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.name) {
+                profileUsernameDisplay.textContent = user.name;
+                accountName.textContent = user.name;
+            }
+            if (user.email) {
+                profileEmailDisplay.textContent = user.email;
+                accountEmail.textContent = user.email;
+            }
+
+            // Elements for edit functionality
+            // Note: avatarUpload needs to be re-referenced after dynamic re-creation
+            let avatarUpload = document.getElementById('avatarUpload');
+            const editUsernameIcon = document.getElementById('editUsernameIcon');
+            const usernameInputContainer = document.getElementById('usernameInputContainer');
+            const usernameEditInput = document.getElementById('usernameEditInput');
+            const usernameSaveButton = document.getElementById('usernameSaveButton');
+
+            // About Me Section elements
+            const profileAboutMeDisplay = document.getElementById('profileAboutMeDisplay');
+            const editAboutMeIcon = document.getElementById('editAboutMeIcon');
+            const aboutMeInputContainer = document.getElementById('aboutMeInputContainer');
+            const aboutMeEditInput = document.getElementById('aboutMeEditInput');
+            const aboutMeSaveButton = document.getElementById('aboutMeSaveButton');
+
+            // Chat History Search
+            const chatHistorySearchInput = document.getElementById('chatHistorySearchInput');
+
+            // Chat Context Menu elements
+            const chatContextMenu = document.getElementById('chatContextMenu');
+            let currentChatContextItem = null; // To keep track of which chat item was right-clicked
+
+            // Toast Container
+            const toastContainer = document.getElementById('toastContainer');
+
+            // Custom Modal Elements
+            confirmModal = document.getElementById('confirmModal');
+            confirmTitle = document.getElementById('confirmTitle');
+            confirmMessage = document.getElementById('confirmMessage');
+            confirmOkButton = document.getElementById('confirmOkButton');
+            confirmCancelButton = document.getElementById('confirmCancelButton');
+
+            const promptModal = document.getElementById('promptModal');
+            const promptTitle = document.getElementById('promptTitle');
+            const promptMessage = document.getElementById('promptMessage');
+            const promptInput = document.getElementById('promptInput');
+            const promptSubmitButton = document.getElementById('promptSubmitButton');
+            const promptCancelButton = document.getElementById('promptCancelButton');
+
+            // Tag Modal Elements (New)
+            const tagModal = document.getElementById('tagModal');
+            const tagModalTitle = document.getElementById('tagModalTitle');
+            const tagOptions = document.getElementById('tagOptions');
+            const tagSaveButton = document.getElementById('tagSaveButton');
+            const tagCancelButton = document.getElementById('tagCancelButton');
+            let currentChatIdForTagging = null;
+            let selectedTags = new Set(); // Stores tags currently selected in the modal
+
+            // New button
+            const startChattingButton = document.getElementById('startChattingButton');
+
+
+            // --- Mock Data (Enhanced) ---
+            // Data is stored in sessionStorage to persist across page reloads in a session
+            let mockUserData = JSON.parse(sessionStorage.getItem('userData')) || {
+                name: 'GAKR User',
+                email: 'gakr.user@example.com',
+                avatar: null, // Base64 string for avatar image
+                aboutMe: '',
+                pinnedChats: [] // Stored as array, converted to Set on load/save
+            };
+
+            // Ensure pinnedChats is a Set for quick lookups and consistency
+            if (mockUserData.pinnedChats && Array.isArray(mockUserData.pinnedChats)) {
+                mockUserData.pinnedChats = new Set(mockUserData.pinnedChats);
+            } else if (!mockUserData.pinnedChats) {
+                mockUserData.pinnedChats = new Set();
+            }
+
+            let mockChatHistory = JSON.parse(sessionStorage.getItem('mockChatHistory')) || [
+                { id: 1, title: "What is AI?", date: "2 days ago", tags: ['Learning'], lastActive: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
+                { id: 2, title: "Poem about the ocean", date: "Yesterday", tags: ['Personal', 'Creative'], lastActive: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
+                { id: 3, title: "Explain quantum physics to me simply", date: "Today", tags: ['Learning', 'Ideas'], lastActive: new Date().toISOString() },
+                { id: 4, title: "Recipe for a simple pasta dish", date: "3 days ago", tags: ['Personal'], lastActive: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() },
+                { id: 5, title: "History of the internet", date: "Last week", tags: ['Learning', 'Work'], lastActive: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() }
+            ];
+
+            // Convert tags arrays to Sets when loading, for consistency with mockUserData.pinnedChats
+            mockChatHistory = mockChatHistory.map(chat => ({
+                ...chat,
+                tags: new Set(chat.tags || [])
+            }));
+
+
+            // --- Utility Functions ---
+
+            // Animated Toast Message Function (Middle of Page)
+            function showToast(message, type = 'info', duration = 3000) {
+                const toast = document.createElement('div');
+                toast.className = `gakr-toast ${type}`;
+                let iconClass = '';
+                switch(type) {
+                    case 'success': iconClass = 'fas fa-check-circle'; break;
+                    case 'error': iconClass = 'fas fa-times-circle'; break;
+                    case 'warning': iconClass = 'fas fa-exclamation-triangle'; break;
+                    default: iconClass = 'fas fa-info-circle'; break;
+                }
+                toast.innerHTML = `<i class="${iconClass} toast-icon"></i> <span>${message}</span>`;
+                toastContainer.appendChild(toast);
+
+                // Show animation
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 10); // Small delay for CSS transition to work
+
+                // Hide animation and remove after duration
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.classList.add('hide'); // Add hide class for exit animation
+                    toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+                }, duration);
+            }
+
+            // Custom Prompt Dialog Function (Middle of Page)
+            function showPromptDialog(message, defaultValue = '', title = 'Enter Information') {
+                return new Promise((resolve) => {
+                    promptTitle.textContent = title;
+                    promptMessage.textContent = message;
+                    promptInput.value = defaultValue;
+                    promptModal.classList.add('show');
+                    promptInput.focus(); // Focus on the input field
+
+                    const triggeringElement = document.activeElement;
+
+                    const handleSubmit = () => {
+                        promptModal.classList.remove('show');
+                        promptSubmitButton.removeEventListener('click', handleSubmit);
+                        promptCancelButton.removeEventListener('click', handleCancel);
+                        promptInput.removeEventListener('keypress', handleKeyPress);
+                        if (triggeringElement) triggeringElement.focus(); // Return focus
+                        resolve(promptInput.value);
+                    };
+
+                    const handleCancel = () => {
+                        promptModal.classList.remove('show');
+                        promptSubmitButton.removeEventListener('click', handleSubmit);
+                        promptCancelButton.removeEventListener('click', handleCancel);
+                        promptInput.removeEventListener('keypress', handleKeyPress);
+                        if (triggeringElement) triggeringElement.focus(); // Return focus
+                        resolve(null); // Return null if cancelled
+                    };
+
+                    const handleKeyPress = (event) => {
+                        if (event.key === 'Enter') {
+                            handleSubmit();
+                        }
+                    };
+
+                    promptSubmitButton.addEventListener('click', handleSubmit);
+                    promptCancelButton.addEventListener('click', handleCancel);
+                    promptInput.addEventListener('keypress', handleKeyPress);
+
+                    // Close on overlay click
+                    promptModal.addEventListener('click', function(event) {
+                        if (event.target === promptModal) {
+                            handleCancel();
+                        }
+                    }, { once: true });
+                });
+            }
+
+            // --- User Data Management (Mock) ---
+            function getUserData() {
+                return mockUserData;
+            }
+
+            function setUserData(data) {
+                // Merge new data while preserving existing keys
+                mockUserData = { ...mockUserData, ...data };
+                // Ensure pinnedChats is always an Array when saving to sessionStorage for JSON stringify
+                const dataToSave = {
+                    ...mockUserData,
+                    pinnedChats: Array.from(mockUserData.pinnedChats)
+                };
+                sessionStorage.setItem('userData', JSON.stringify(dataToSave));
+                updateProfileUI(); // Update UI after data change
+            }
+
+            function getChatHistory() {
+                // Return a deep copy to prevent direct modification outside of updateChatInHistory
+                return JSON.parse(JSON.stringify(Array.from(mockChatHistory).map(chat => ({ ...chat, tags: Array.from(chat.tags) }))));
+            }
+
+            function saveChatHistory() {
+                // Convert tags back to arrays for storage
+                const chatsToSave = mockChatHistory.map(chat => ({
+                    ...chat,
+                    tags: Array.from(chat.tags) // Convert Set to Array for JSON stringify
+                }));
+                sessionStorage.setItem('mockChatHistory', JSON.stringify(chatsToSave));
+            }
+
+            function updateChatInHistory(chatId, update) {
+                const index = mockChatHistory.findIndex(chat => chat.id === chatId);
+                if (index !== -1) {
+                    // Ensure tags are handled as Sets internally
+                    if (update.tags && ! (update.tags instanceof Set)) {
+                         update.tags = new Set(update.tags);
+                    }
+                    mockChatHistory[index] = { ...mockChatHistory[index], ...update };
+                    saveChatHistory();
+                }
+            }
+
+            function deleteChatFromHistory(chatId) {
+                const initialLength = mockChatHistory.length;
+                mockChatHistory = mockChatHistory.filter(chat => chat.id !== chatId);
+                if (mockUserData.pinnedChats.has(chatId)) {
+                    mockUserData.pinnedChats.delete(chatId);
+                    setUserData({}); // Save updated pinned chats (which triggers UI update)
+                } else {
+                    saveChatHistory(); // Only save if pinned chats weren't updated
+                }
+                return mockChatHistory.length < initialLength; // Return true if deleted
+            }
+
+            // --- UI Update Logic ---
+            function updateProfileUI() {
+                const userData = getUserData();
+
+                // Update header profile button
+                if (profileButton) {
+                    profileButton.textContent = userData.name.charAt(0).toUpperCase();
+                    profileButton.title = userData.name;
+                }
+
+                // Update large avatar
+                if (profileAvatarLarge) {
+                    profileAvatarLarge.innerHTML = ''; // Clear existing content
+                    if (userData.avatar) {
+                        const img = document.createElement('img');
+                        img.src = userData.avatar;
+                        img.alt = "User Avatar";
+                        profileAvatarLarge.appendChild(img);
+                    } else {
+                        profileAvatarLarge.textContent = userData.name.charAt(0).toUpperCase();
+                    }
+                    // Add the edit icon and input back dynamically
+                    const label = document.createElement('label');
+                    label.htmlFor = 'avatarUpload'; // Important: ensures label clicks input
+                    label.className = 'profile-avatar-edit-icon';
+                    label.title = 'Change Avatar';
+                    label.innerHTML = '<i class="fas fa-camera"></i>';
+                    // Create a *new* input element and assign its ID, then append to label
+                    const newInput = document.createElement('input');
+                    newInput.type = 'file';
+                    newInput.id = 'avatarUpload'; // Reuse the ID
+                    newInput.accept = 'image/*';
+                    newInput.style.display = 'none';
+                    label.appendChild(newInput);
+                    profileAvatarLarge.appendChild(label);
+
+                    // Re-assign the global avatarUpload reference to the new element
+                    avatarUpload = newInput;
+                    // Re-attach event listener for the dynamically created input
+                    avatarUpload.addEventListener('change', handleAvatarUpload);
+                }
+
+                // Update username displays
+                if (profileUsernameDisplay) profileUsernameDisplay.textContent = userData.name;
+                if (accountName) accountName.textContent = userData.name;
+                if (profileEmailDisplay) profileEmailDisplay.textContent = userData.email;
+                if (accountEmail) accountEmail.textContent = userData.email;
+
+                // Update About Me display
+                if (profileAboutMeDisplay) {
+                    profileAboutMeDisplay.textContent = userData.aboutMe || 'Tell us something about yourself...';
+                    // Add/remove placeholder class for italicized gray text
+                    profileAboutMeDisplay.classList.toggle('placeholder', !userData.aboutMe);
+                }
+
+
+                // Ensure auth controls are set for a "logged in" state
+                if (signInRegisterButton) signInRegisterButton.style.display = 'none';
+                if (profileControls) profileControls.style.display = 'block';
+
+                // Update chat history list based on current filters
+                renderChatHistory(chatHistorySearchInput.value);
+            }
+
+            // --- Edit Profile Functions ---
+            function handleAvatarUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        setUserData({ avatar: e.target.result });
+                        showToast('Avatar updated successfully!', 'success');
+                    };
+                    reader.onerror = function() {
+                        showToast('Failed to read file.', 'error');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    showToast('No file selected.', 'warning');
+                }
+            }
+
+            function toggleUsernameEdit(show) {
+                if (show) {
+                    profileUsernameDisplay.style.display = 'none';
+                    editUsernameIcon.style.display = 'none';
+                    usernameInputContainer.style.display = 'flex'; // Use flex for button alignment
+                    usernameEditInput.value = getUserData().name;
+                    usernameEditInput.focus();
+                    usernameEditInput.setSelectionRange(usernameEditInput.value.length, usernameEditInput.value.length); // Put cursor at end
+                } else {
+                    profileUsernameDisplay.style.display = 'block';
+                    editUsernameIcon.style.display = 'inline-block';
+                    usernameInputContainer.style.display = 'none';
+                }
+            }
+
+            function toggleAboutMeEdit(show) {
+                if (show) {
+                    profileAboutMeDisplay.style.display = 'none';
+                    editAboutMeIcon.style.display = 'none';
+                    aboutMeInputContainer.style.display = 'flex'; // Use flex-direction: column in CSS
+                    aboutMeEditInput.value = getUserData().aboutMe;
+                    aboutMeEditInput.focus();
+                    aboutMeEditInput.setSelectionRange(aboutMeEditInput.value.length, aboutMeEditInput.value.length); // Put cursor at end
+                } else {
+                    profileAboutMeDisplay.style.display = 'block';
+                    editAboutMeIcon.style.display = 'inline-block';
+                    aboutMeInputContainer.style.display = 'none';
+                }
+            }
+
+            // --- Chat History Rendering and Management ---
+
+            function renderChatHistory(searchTerm = '') {
+                const chatHistory = getChatHistory();
+                chatHistoryList.innerHTML = ''; // Clear existing list
+
+                // Filter
+                let filteredChats = chatHistory.filter(chat =>
+                    chat.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    Array.from(chat.tags).some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+                );
+
+                // Separate pinned and unpinned chats
+                let pinnedChats = [];
+                let unpinnedChats = [];
+
+                filteredChats.forEach(chat => {
+                    // Check against mockUserData.pinnedChats Set
+                    if (mockUserData.pinnedChats.has(chat.id)) {
+                        pinnedChats.push(chat);
+                    } else {
+                        unpinnedChats.push(chat);
+                    }
+                });
+
+                // Sort (always newest first for simplicity after removing sort dropdown)
+                const sortFunction = (a, b) => {
+                    const dateA = new Date(a.lastActive);
+                    const dateB = new Date(b.lastActive);
+                    return dateB.getTime() - dateA.getTime(); // Newest first
+                };
+
+                pinnedChats.sort(sortFunction);
+                unpinnedChats.sort(sortFunction);
+
+                // Combine pinned and unpinned (pinned always come first)
+                const chatsToDisplay = [...pinnedChats, ...unpinnedChats];
+
+                if (chatsToDisplay.length === 0) {
+                    emptyChatHistoryMessage.style.display = 'block';
+                } else {
+                    emptyChatHistoryMessage.style.display = 'none';
+                    chatsToDisplay.forEach(chat => {
+                        const chatItem = document.createElement('div');
+                        chatItem.className = 'chat-history-item';
+                        chatItem.dataset.chatId = chat.id; // Store chat ID on the element
+                        if (mockUserData.pinnedChats.has(chat.id)) {
+                            chatItem.classList.add('pinned');
+                        }
+
+                        // Format last active time
+                        let lastActiveText = '';
+                        try {
+                            const lastActiveDate = new Date(chat.lastActive);
+                            const now = new Date();
+                            const diffMs = now.getTime() - lastActiveDate.getTime();
+                            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                            if (diffDays === 0 && lastActiveDate.toDateString() === now.toDateString()) {
+                                lastActiveText = `Today, ${lastActiveDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                            } else if (diffDays === 1 || (diffDays === 0 && lastActiveDate.getDate() === now.getDate() - 1)) {
+                                lastActiveText = `Yesterday, ${lastActiveDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                            } else if (diffDays < 7) {
+                                lastActiveText = `${lastActiveDate.toLocaleDateString('en-US', { weekday: 'short' })}, ${lastActiveDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                            } else {
+                                lastActiveText = lastActiveDate.toLocaleDateString();
+                            }
+                        } catch (e) {
+                            lastActiveText = chat.date; // Fallback if date is invalid or missing
+                        }
+
+
+                        chatItem.innerHTML = `
+                            <div class="chat-title-wrapper">
+                                <span class="chat-title">${chat.title}</span>
+                                ${mockUserData.pinnedChats.has(chat.id) ? '<i class="fas fa-thumbtack pinned-icon" title="Pinned"></i>' : ''}
+                            </div>
+                            <div class="chat-meta">
+                                <span class="chat-date">${chat.date}</span>
+                                <span class="chat-history-last-active">Last active: ${lastActiveText}</span>
+                            </div>
+                            <div class="chat-tags">
+                                ${Array.from(chat.tags).map(tag => `<span>${tag}</span>`).join('')}
+                            </div>
+                        `;
+                        chatHistoryList.appendChild(chatItem);
+                    });
+                }
+            }
+
+            // --- Context Menu Functions ---
+            function showContextMenu(x, y, chatItem) {
+                // Ensure menu doesn't go off-screen
+                let posX = x;
+                let posY = y;
+
+                // Adjust X if too close to right edge
+                const menuWidth = chatContextMenu.offsetWidth;
+                if (posX + menuWidth > window.innerWidth - 20) { // 20px padding from right
+                    posX = window.innerWidth - menuWidth - 20;
+                }
+                // Adjust Y if too close to bottom edge
+                const menuHeight = chatContextMenu.offsetHeight;
+                if (posY + menuHeight > window.innerHeight - 20) { // 20px padding from bottom
+                    posY = window.innerHeight - menuHeight - 20;
+                }
+
+                chatContextMenu.style.left = `${posX}px`;
+                chatContextMenu.style.top = `${posY}px`;
+                chatContextMenu.classList.add('show');
+                currentChatContextItem = chatItem; // Store the clicked item
+
+                const chatId = parseInt(currentChatContextItem.dataset.chatId);
+                const pinUnpinLink = chatContextMenu.querySelector('[data-action="pin"], [data-action="unpin"]');
+                if (mockUserData.pinnedChats.has(chatId)) {
+                    pinUnpinLink.innerHTML = '<i class="fas fa-thumbtack"></i> Unpin';
+                    pinUnpinLink.dataset.action = 'unpin';
+                } else {
+                    pinUnpinLink.innerHTML = '<i class="fas fa-thumbtack"></i> Pin';
+                    pinUnpinLink.dataset.action = 'pin';
+                }
+            }
+
+            function hideContextMenu() {
+                chatContextMenu.classList.remove('show');
+                currentChatContextItem = null;
+            }
+
+            // --- Tag Modal Functions (New) ---
+            function showTagModal(chatId, currentTags) {
+                currentChatIdForTagging = chatId;
+                selectedTags = new Set(currentTags); // Initialize selected tags from the chat's current tags
+
+                // Clear previous selections and populate options
+                tagOptions.innerHTML = '';
+                // Extendable list of available tags
+                const availableTags = ['Work', 'Personal', 'Creative', 'Ideas', 'Learning', 'Research', 'Drafts', 'Notes', 'Projects', 'Finance', 'Health'];
+
+                availableTags.forEach(tag => {
+                    const tagDiv = document.createElement('div');
+                    tagDiv.className = 'tag-option';
+                    tagDiv.dataset.tag = tag;
+                    tagDiv.textContent = tag;
+                    if (selectedTags.has(tag)) {
+                        tagDiv.classList.add('selected');
+                    }
+                    tagDiv.addEventListener('click', () => {
+                        if (selectedTags.has(tag)) {
+                            selectedTags.delete(tag);
+                            tagDiv.classList.remove('selected');
+                        } else {
+                            selectedTags.add(tag);
+                            tagDiv.classList.add('selected');
+                        }
+                    });
+                    tagOptions.appendChild(tagDiv);
+                });
+
+                tagModal.classList.add('show');
+                // Store the element that triggered the modal for focus management
+                tagModal.triggeringElement = document.activeElement;
+            }
+
+            function hideTagModal() {
+                tagModal.classList.remove('show');
+                currentChatIdForTagging = null;
+                selectedTags = new Set(); // Reset selected tags
+                if (tagModal.triggeringElement) tagModal.triggeringElement.focus(); // Return focus
+                tagModal.triggeringElement = null;
+            }
+
+
+            // --- Event Listeners ---
+
+            // Dropdown menu toggle
+            profileButton.addEventListener('click', function(event) {
+                event.stopPropagation(); // Prevent document click from closing immediately
+                profileDropdown.classList.toggle('show');
+            });
+
+            // Close dropdown and context menu if clicked outside
+            document.addEventListener('click', function(event) {
+                if (!profileDropdown.contains(event.target) && !profileButton.contains(event.target)) {
+                    profileDropdown.classList.remove('show');
+                }
+                if (!chatContextMenu.contains(event.target) && !event.target.closest('.chat-history-item')) {
+                    hideContextMenu();
+                }
+            });
+
+            // Prevent context menu from closing if right-clicking the menu itself
+            chatContextMenu.addEventListener('contextmenu', function(event) {
+                event.preventDefault();
+            });
+
+            // Navigation from dropdown (Mock functionality)
+            if (profileLink) {
+                profileLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    profileDropdown.classList.remove('show');
+                    showToast('You are already on your profile page!', 'info');
+                });
+            }
+        if (profileSettingsButton) {
+                profileSettingsButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showToast('Profile settings coming soon!', 'info');
+                });
+            }
+            if (settingsLink) {
+                settingsLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showToast('Settings page is under development!', 'info');
+                    profileDropdown.classList.remove('show');
+                });
+            }
+
+            // Logout (from header dropdown) - removed, using onclick for profile logout
+
+            // Handle profile settings button on the profile page
+            
+
+            // Profile logout is now handled by onclick in HTML
+
+            // Username Edit Listeners
+            editUsernameIcon.addEventListener('click', () => toggleUsernameEdit(true));
+            usernameSaveButton.addEventListener('click', function() {
+                const newUsername = usernameEditInput.value.trim();
+                if (newUsername) {
+                    setUserData({ name: newUsername });
+                    toggleUsernameEdit(false);
+                    showToast('Username updated successfully!', 'success');
+                } else {
+                    showToast('Username cannot be empty!', 'error');
+                }
+            });
+            usernameEditInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    usernameSaveButton.click(); // Trigger save button click on Enter
+                }
+            });
+
+            // About Me Edit Listeners
+            editAboutMeIcon.addEventListener('click', () => toggleAboutMeEdit(true));
+            aboutMeSaveButton.addEventListener('click', function() {
+                const newAboutMe = aboutMeEditInput.value.trim();
+                setUserData({ aboutMe: newAboutMe }); // Allow empty string for about me
+                toggleAboutMeEdit(false);
+                showToast('About Me section updated!', 'success');
+            });
+            aboutMeEditInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) { // Allow Shift+Enter for new line
+                    e.preventDefault(); // Prevent default Enter behavior (new line)
+                    aboutMeSaveButton.click();
+                }
+            });
+
+
+            // Chat History Search Listener
+            chatHistorySearchInput.addEventListener('input', () => renderChatHistory(chatHistorySearchInput.value));
+
+
+            // Chat History Context Menu Listeners (Right-click)
+            chatHistoryList.addEventListener('contextmenu', function(event) {
+                const chatItem = event.target.closest('.chat-history-item');
+                if (chatItem) {
+                    event.preventDefault(); // Prevent default browser context menu
+                    showContextMenu(event.clientX, event.clientY, chatItem);
+                }
+            });
+
+            // Handle actions from the chat context menu
+            chatContextMenu.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default link behavior
+                const actionElement = event.target.closest('.chat-context-menu-item');
+                if (actionElement && currentChatContextItem) {
+                    const action = actionElement.dataset.action;
+                    const chatId = parseInt(currentChatContextItem.dataset.chatId);
+
+                    switch (action) {
+                        case 'delete':
+                            showConfirmDialog('Are you sure you want to delete this conversation? This action cannot be undone.', 'Delete Conversation')
+                                .then(result => {
+                                    if (result) {
+                                        if (deleteChatFromHistory(chatId)) {
+                                            showToast('Conversation deleted.', 'success');
+                                            renderChatHistory(chatHistorySearchInput.value); // Re-render after deletion
+                                        } else {
+                                            showToast('Failed to delete conversation.', 'error');
+                                        }
+                                    }
+                                });
+                            break;
+                        case 'share':
+                            showPromptDialog('Enter email or username to share with:', '', 'Share Conversation')
+                                .then(input => {
+                                    if (input !== null) { // Check for null (cancelled)
+                                        if (input.trim() !== '') {
+                                            showToast(`Conversation shared with "${input}". (Mock)`, 'success');
+                                        } else {
+                                            showToast('Share cancelled. No recipient provided.', 'warning');
+                                        }
+                                    }
+                                });
+                            break;
+                        case 'pin':
+                            mockUserData.pinnedChats.add(chatId);
+                            setUserData({}); // Save updated pinned chats (triggers UI update)
+                            showToast('Conversation pinned!', 'success');
+                            // renderChatHistory is called by setUserData
+                            break;
+                        case 'unpin':
+                            mockUserData.pinnedChats.delete(chatId);
+                            setUserData({}); // Save updated pinned chats (triggers UI update)
+                            showToast('Conversation unpinned!', 'info');
+                            // renderChatHistory is called by setUserData
+                            break;
+                        case 'tag':
+                            const chatToTag = mockChatHistory.find(chat => chat.id === chatId);
+                            if (chatToTag) {
+                                showTagModal(chatId, chatToTag.tags);
+                            }
+                            break;
+                    }
+                    hideContextMenu(); // Always hide after an action
+                }
+            });
+
+            // Handle clicks on chat items (to potentially open a conversation)
+            chatHistoryList.addEventListener('click', function(event) {
+                const chatItem = event.target.closest('.chat-history-item');
+                if (chatItem) {
+                    const chatId = chatItem.dataset.chatId;
+                    showToast(`Opening conversation: ${chatItem.querySelector('.chat-title').textContent} (ID: ${chatId}). (Mock)`, 'info');
+                    // In a real application, you would navigate to the chat page:
+                    // window.location.href = `chat.html?chatId=${chatId}`;
+                }
+            });
+
+            // Tag Modal Listeners (New)
+            tagSaveButton.addEventListener('click', function() {
+                if (currentChatIdForTagging !== null) {
+                    // Update the chat with the new set of tags
+                    updateChatInHistory(currentChatIdForTagging, { tags: Array.from(selectedTags) });
+                    showToast('Tags updated successfully!', 'success');
+                    hideTagModal();
+                    renderChatHistory(chatHistorySearchInput.value); // Re-render to reflect new tags
+                }
+            });
+
+            tagCancelButton.addEventListener('click', hideTagModal);
+
+            // Close Tag Modal on overlay click
+            tagModal.addEventListener('click', function(event) {
+                if (event.target === tagModal) {
+                    hideTagModal();
+                }
+            });
+
+            // Initial UI setup
+            updateProfileUI(); // Call once on load to populate existing data
+        });
+    </script>
+</body>
+</html>

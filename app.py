@@ -1,9 +1,10 @@
+import os
 import json
 import random
 import datetime
 import re
 import smtplib
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from email.mime.text import MIMEText
@@ -15,8 +16,8 @@ app = Flask(__name__)
 limiter = Limiter(app=app, key_func=get_remote_address, default_limits=[])
 
 # --- Email Config (Gmail SMTP) ---
-SMTP_EMAIL = 'e254150@gmail.com'
-SMTP_PASSWORD = 'abcd efgh ijkl mnop'  # <-- Paste Gmail App Password here
+SMTP_EMAIL = 'rn8711399@gmail.com'
+SMTP_PASSWORD = 'govcgmwspnbtpdwk'  # Gmail App Password
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
@@ -68,7 +69,27 @@ def send_otp_email(to_email, otp):
 # --- Routes ---
 @app.route('/')
 def index():
+    return render_template('chat.html')
+
+@app.route('/auth')
+def auth():
     return render_template('auth.html')
+
+@app.route('/auth.html')
+def auth_html():
+    return redirect('/auth')
+
+@app.route('/index')
+def home():
+    return render_template('chat.html')
+
+@app.route('/chat')
+def chat():
+    return render_template('chat.html')
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
 
 @app.route('/api/signup', methods=['POST'])
 def signup():
@@ -92,6 +113,7 @@ def signup():
     hashed_pw = pbkdf2_sha256.hash(password)
     users.append({'name': name, 'email': email, 'password': hashed_pw})
     save_users(users)
+    os.makedirs(f'userdata/{name}', exist_ok=True)
 
     return jsonify({'message': 'Signup successful!'}), 201
 
@@ -114,27 +136,38 @@ def login():
     return jsonify({'message': 'Invalid credentials.'}), 401
 
 @app.route('/api/forgot_password_request', methods=['POST'])
-@limiter.limit("3 per hour")
+@limiter.limit("10 per minute")
 def forgot_password_request():
     data = request.get_json()
     email = data.get('email')
+    print(f"DEBUG: Received email: {email}")
     if not email or not is_valid_email(email):
+        print(f"DEBUG: Email validation failed for: {email}")
         return jsonify({'message': 'Valid email required.'}), 400
 
     users = load_users()
-    if not any(u['email'].lower() == email.lower() for u in users):
-        return jsonify({'message': 'If this email exists, an OTP will be sent.'}), 200
+    print(f"DEBUG: Loaded users: {users}")
+    email_lower = email.lower()
+    found = any(u['email'].lower() == email_lower for u in users)
+    print(f"DEBUG: Email {email_lower} found in users: {found}")
 
-    otp = str(random.randint(100000, 999999))
+    if not found:
+        print(f"DEBUG: Email not registered: {email}")
+        return jsonify({'message': 'Email not registered. Please check your email address or sign up.'}), 404
+
+    otp = str(random.randint(10000000, 99999999))
     expiry = (datetime.datetime.now() + datetime.timedelta(minutes=5)).isoformat()
 
+    print(f"DEBUG: Attempting to send OTP to: {email}")
     if not send_otp_email(email, otp):
+        print(f"DEBUG: Email sending failed for: {email}")
         return jsonify({'message': 'Failed to send OTP. Try again later.'}), 500
 
     otps = load_reset_otps()
     otps[email] = {'otp': otp, 'expiry': expiry, 'verified': False}
     save_reset_otps(otps)
 
+    print(f"DEBUG: OTP sent successfully to: {email}")
     return jsonify({'message': 'OTP sent to your email.'}), 200
 
 @app.route('/api/verify_otp', methods=['POST'])
@@ -180,7 +213,33 @@ def reset_password():
 
     return jsonify({'message': 'User not found.'}), 404
 
-# --- App Startup ---
+@app.route('/api/check_user', methods=['POST'])
+def check_user():
+    data = request.get_json()
+    identifier = data.get('identifier')  # email or name
+    users = load_users()
+    exists = any(u['email'].lower() == identifier.lower() or u['name'].lower() == identifier.lower() for u in users)
+    return jsonify({'exists': exists})
+
+@app.route('/api/analyze', methods=['POST'])
+@limiter.limit("10 per minute")
+def analyze():
+    # For now, return a mock response since no AI model is integrated
+    # In a real implementation, this would process the prompt and files with an AI model
+    prompt = request.form.get('prompt', '')
+    files = request.files.getlist('files')
+    
+    # Mock response
+    response = f"I received your message: '{prompt}'. "
+    if files:
+        response += f"You attached {len(files)} file(s): {[f.filename for f in files]}."
+    else:
+        response += "No files attached."
+    
+    response += " This is a placeholder response. Please integrate with your preferred AI model."
+    
+    return jsonify({'response': response})
+
 if __name__ == '__main__':
     for file, init in [(USERS_FILE, []), (RESET_OTPS_FILE, {})]:
         try:

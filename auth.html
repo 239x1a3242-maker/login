@@ -40,7 +40,7 @@
             width: 100%;
             background: -webkit-linear-gradient(left, #003366,#004080,#0059b3 , #0073e6);
             color: var(--bs-body-color);
-            padding-top: 5vh;
+            padding-top: calc(64px + 5vh);
             padding-bottom: 5vh;
             min-height: 100vh;
             /* Allow space for modal overlay */
@@ -442,16 +442,25 @@
              font-size: 0.9rem;
              color: var(--bs-body-color);
          }
-         .modal-form input[type="text"],
-         .modal-form input[type="email"],
-         .modal-form input[type="password"] {
-             width: 100%;
-             padding: 10px 15px;
+         .otp-input-container {
+             display: flex;
+             gap: 5px;
+             justify-content: center;
+             margin-bottom: 10px;
+         }
+         .otp-digit {
+             width: 40px;
+             height: 40px;
+             text-align: center;
              border: 1px solid var(--bs-border-color);
-             border-radius: 10px;
+             border-radius: 5px;
+             font-size: 1.2rem;
              background-color: var(--bs-body-bg);
              color: var(--bs-body-color);
-             box-sizing: border-box; /* Crucial for consistent width */
+         }
+         .otp-digit:focus {
+             border-color: var(--gakr-blue);
+             outline: none;
          }
          .modal-form .error-message {
             position: static; /* Remove absolute positioning */
@@ -469,9 +478,96 @@
              width: 100%;
              max-width: 150px;
          }
+
+        /* Header styles */
+        .gakr-chat-header {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bs-border-color);
+            height: 64px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background-color: var(--bs-body-bg);
+            z-index: 10;
+        }
+
+        .gakr-logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .gakr-brand-logo {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gakr-brand-text {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--gakr-blue);
+        }
+
+        .gakr-nav-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .gakr-login-button {
+            color: var(--gakr-blue);
+            text-decoration: none;
+            background: transparent;
+            border: 1px solid var(--gakr-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .gakr-login-button:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+
+        .gakr-profile-button {
+            color: var(--gakr-blue);
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gakr-profile-button:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
     </style>
 </head>
 <body>
+    <header class="gakr-chat-header">
+        <div class="gakr-logo-area">
+            <a href="/" class="gakr-brand-logo">
+                <i class="fas fa-robot" style="color: var(--gakr-blue);"></i>
+            </a>
+            <a href="/" class="gakr-brand-text" style="text-decoration: none;">GAKR AI</a>
+        </div>
+
+        <div class="gakr-nav-controls" id="authButtonContainer">
+            <a href="/auth" class="gakr-login-button">Sign in / Register</a>
+        </div>
+    </header>
 
     <div class="wrapper">
         <div class="title-text">
@@ -540,32 +636,45 @@
     </div>
 
     <div class="modal-overlay" id="forgotPasswordRequestModal">
-        <div class="modal-content">
-            <p class="modal-message" id="forgotModalMessage">Enter your registered email to request a password reset.</p>
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 style="text-align: center; margin-bottom: 20px; color: var(--gakr-blue);">Reset Password</h3>
+            <p class="modal-message" id="forgotModalMessage" style="text-align: center; margin-bottom: 25px;">Enter your registered email address to receive a password reset code.</p>
             
             <form id="forgotPasswordRequestForm" class="modal-form">
-                <div class="field">
-                    <label for="forgotEmail">Email:</label>
-                    <input type="email" id="forgotEmail" name="email" required>
-                    <div class="error-message" id="forgotEmailError"></div>
+                <div class="field" style="margin-bottom: 30px;">
+                    <label for="forgotEmail" style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--bs-body-color);">Email Address:</label>
+                    <input type="email" id="forgotEmail" name="email" required style="width: 100%; padding: 12px; border: 2px solid var(--bs-border-color); border-radius: 8px; font-size: 16px; background-color: var(--bs-body-bg); color: var(--bs-body-color);" placeholder="Enter your email">
+                    <div class="error-message" id="forgotEmailError" style="margin-top: 8px;"></div>
                 </div>
                 <div class="modal-buttons-stacked">
-                    <button type="submit" class="modal-button" id="forgotSubmitButton">Request OTP</button>
-                    <button type="button" class="modal-button" id="forgotCancelButton" style="background-color: var(--bs-secondary-color);">Cancel</button>
+                    <button type="submit" class="modal-button" id="forgotSubmitButton" style="width: 100%; padding: 12px; font-size: 16px;">Send Reset Code</button>
+                    <button type="button" class="modal-button" id="forgotCancelButton" style="width: 100%; padding: 12px; font-size: 16px; background-color: var(--bs-secondary-color); margin-top: 10px;">Cancel</button>
                 </div>
             </form>
 
             <div id="otpSection" style="display: none;">
+                <h3 style="text-align: center; margin-bottom: 20px; color: var(--gakr-blue);">Enter Verification Code</h3>
+                <p style="text-align: center; margin-bottom: 25px; color: var(--bs-secondary-color);">We've sent a 8-digit code to your email. Enter it below to continue.</p>
                 <form id="verifyOtpForm" class="modal-form">
-                    <div class="field">
-                        <label for="otpInput">Enter OTP:</label>
-                        <input type="text" id="otpInput" name="otp" required maxlength="6" pattern="\d{6}" title="Please enter a 6-digit OTP">
-                        <div class="error-message" id="otpError"></div>
+                    <div class="field" style="margin-bottom: 30px;">
+                        <label style="display: block; margin-bottom: 15px; font-weight: 500; color: var(--bs-body-color); text-align: center;">Verification Code:</label>
+                        <div class="otp-input-container" style="display: flex; justify-content: center; gap: 8px; margin-bottom: 10px;">
+                            <input type="text" class="otp-digit" maxlength="1" pattern="\d" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: bold; border: 2px solid var(--bs-border-color); border-radius: 8px; background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                            <input type="text" class="otp-digit" maxlength="1" pattern="\d" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: bold; border: 2px solid var(--bs-border-color); border-radius: 8px; background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                            <input type="text" class="otp-digit" maxlength="1" pattern="\d" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: bold; border: 2px solid var(--bs-border-color); border-radius: 8px; background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                            <input type="text" class="otp-digit" maxlength="1" pattern="\d" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: bold; border: 2px solid var(--bs-border-color); border-radius: 8px; background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                            <input type="text" class="otp-digit" maxlength="1" pattern="\d" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: bold; border: 2px solid var(--bs-border-color); border-radius: 8px; background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                            <input type="text" class="otp-digit" maxlength="1" pattern="\d" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: bold; border: 2px solid var(--bs-border-color); border-radius: 8px; background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                            <input type="text" class="otp-digit" maxlength="1" pattern="\d" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: bold; border: 2px solid var(--bs-border-color); border-radius: 8px; background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                            <input type="text" class="otp-digit" maxlength="1" pattern="\d" required style="width: 45px; height: 50px; text-align: center; font-size: 20px; font-weight: bold; border: 2px solid var(--bs-border-color); border-radius: 8px; background-color: var(--bs-body-bg); color: var(--bs-body-color);">
+                        </div>
+                        <input type="hidden" id="otpInput" name="otp">
+                        <div class="error-message" id="otpError" style="text-align: center; margin-top: 10px;"></div>
                     </div>
                     <div class="modal-buttons-stacked">
-                        <button type="submit" class="modal-button" id="verifyOtpButton">Verify OTP</button>
-                        <button type="button" class="modal-button" id="resendOtpButton" style="background-color: var(--bs-secondary-color);">Send Again</button>
-                        <button type="button" class="modal-button" id="otpCancelButton" style="background-color: var(--bs-secondary-color);">Cancel</button>
+                        <button type="submit" class="modal-button" id="verifyOtpButton" style="width: 100%; padding: 12px; font-size: 16px;">Verify Code</button>
+                        <button type="button" class="modal-button" id="resendOtpButton" style="width: 100%; padding: 12px; font-size: 16px; margin-top: 10px;">Send Code Again</button>
+                        <button type="button" class="modal-button" id="otpCancelButton" style="width: 100%; padding: 12px; font-size: 16px; background-color: var(--bs-secondary-color); margin-top: 10px;">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -603,6 +712,34 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- Authentication Status Check ---
+        function updateAuthButton() {
+            const authButtonContainer = document.getElementById('authButtonContainer');
+            const userIsLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+            if (userIsLoggedIn) {
+                authButtonContainer.innerHTML = `
+                    <a href="/profile" class="gakr-profile-button">
+                        <i class="fas fa-user-circle me-2"></i>Profile
+                    </a>
+                `;
+                 const profileButton = authButtonContainer.querySelector('.gakr-profile-button');
+                 if (profileButton) {
+                     profileButton.addEventListener('click', function(event) {
+                         console.log("Profile button clicked!");
+                     });
+                 }
+            } else {
+                authButtonContainer.innerHTML = `
+                    <a href="/auth" class="gakr-login-button">Sign in / Register</a>
+                `;
+            }
+        }
+
+        updateAuthButton();
+        window.addEventListener('focus', updateAuthButton);
+        window.addEventListener('storage', updateAuthButton);
+
         const loginText = document.querySelector(".title-text .login");
         const loginFormDiv = document.querySelector("form.login");
         const signupLink = document.querySelector("form .signup-link a");
@@ -638,7 +775,20 @@
         const modalMessageDiv = document.getElementById('modalMessage');
         const modalButtonsContainer = document.getElementById('modalButtonsContainer');
 
-        // Forgot Password Request & OTP Modals elements
+        // OTP digit inputs
+        const otpDigits = document.querySelectorAll('.otp-digit');
+        otpDigits.forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1 && index < otpDigits.length - 1) {
+                    otpDigits[index + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                    otpDigits[index - 1].focus();
+                }
+            });
+        });
         const forgotPasswordLink = document.getElementById('forgotPasswordLink');
         const forgotPasswordRequestModal = document.getElementById('forgotPasswordRequestModal'); // The main overlay for forgot/otp
         const forgotModalMessage = document.getElementById('forgotModalMessage'); // Message within the forgot/otp modal
@@ -677,6 +827,31 @@
 
         // Stores the email across the forgot password/OTP/reset flow
         let currentForgotEmail = '';
+
+        // Resend OTP cooldown variables
+        let resendCooldown = 0;
+        let resendInterval = null;
+
+        // Function to start resend cooldown timer
+        function startResendCooldown() {
+            resendCooldown = 60; // 60 seconds
+            resendOtpButton.disabled = true;
+            resendOtpButton.textContent = `Send Again (60s)`;
+            resendOtpButton.style.backgroundColor = 'var(--bs-secondary-color)'; // Gray during cooldown
+
+            resendInterval = setInterval(() => {
+                resendCooldown--;
+                if (resendCooldown > 0) {
+                    resendOtpButton.textContent = `Send Again (${resendCooldown}s)`;
+                } else {
+                    clearInterval(resendInterval);
+                    resendInterval = null;
+                    resendOtpButton.disabled = false;
+                    resendOtpButton.textContent = 'Send Code Again';
+                    resendOtpButton.style.backgroundColor = ''; // Reset to default (primary blue)
+                }
+            }, 1000);
+        }
 
         // Function to clear all error messages and input error classes
         function clearErrors(formType = 'all') {
@@ -851,7 +1026,7 @@
 
         // Login Form Submission Handler
         if (loginForm) {
-            loginForm.addEventListener('submit', function(event) {
+            loginForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
                 clearErrors('main'); // Clear main form errors
 
@@ -878,6 +1053,23 @@
                 }
 
                 if (isValid) {
+                    // Check if user exists
+                    try {
+                        const checkResponse = await fetch('/api/check_user', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ identifier: usernameOrEmail })
+                        });
+                        const checkData = await checkResponse.json();
+                        if (!checkData.exists) {
+                            loginUsernameOrEmailError.textContent = 'User does not exist.';
+                            loginUsernameOrEmailInput.classList.add('error');
+                            return;
+                        }
+                    } catch (error) {
+                        console.error('Error checking user:', error);
+                        // Proceed anyway
+                    }
                     submitFormData(event.target, loginSubmitButton, '/api/login', 'main');
                 }
             });
@@ -885,7 +1077,7 @@
 
         // Signup Form Submission Handler
         if (signupForm) {
-            signupForm.addEventListener('submit', function(event) {
+            signupForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
                 clearErrors('main');
 
@@ -934,6 +1126,23 @@
                 }
 
                 if (isValid) {
+                    // Check if user already exists
+                    try {
+                        const checkResponse = await fetch('/api/check_user', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ identifier: email })
+                        });
+                        const checkData = await checkResponse.json();
+                        if (checkData.exists) {
+                            signupEmailError.textContent = 'Email already registered.';
+                            signupEmailInput.classList.add('error');
+                            return;
+                        }
+                    } catch (error) {
+                        console.error('Error checking user:', error);
+                        // Proceed anyway
+                    }
                     submitFormData(event.target, signupSubmitButton, '/api/signup', 'main');
                 }
             });
@@ -954,6 +1163,12 @@
                 // Show the email request form and hide the OTP section
                 forgotPasswordRequestForm.style.display = 'block';
                 if (otpSection) otpSection.style.display = 'none'; // Ensure OTP section is hidden initially
+
+                // Reset modal size for email input
+                const modalContent = forgotPasswordRequestModal.querySelector('.modal-content');
+                if (modalContent) {
+                    modalContent.style.maxWidth = '450px';
+                }
 
                 showCustomModal(forgotPasswordRequestModal);
             });
@@ -999,6 +1214,12 @@
                             if (otpSection) otpSection.style.display = 'block';
                             otpInput.value = ''; // Clear previous OTP in case of resend
 
+                            // Increase modal size for OTP section
+                            const modalContent = forgotPasswordRequestModal.querySelector('.modal-content');
+                            if (modalContent) {
+                                modalContent.style.maxWidth = '550px';
+                            }
+
                             // Update message for OTP section
                             let messageText = `<p>An OTP has been sent to <strong>${email}</strong>. Please enter it below.</p>`;
                             // Note: Do not display simulated OTP in production. This is for testing convenience.
@@ -1006,9 +1227,30 @@
                             //     messageText += `<p><strong>SIMULATED OTP (FOR TESTING):</strong> ${result.simulated_otp}</p>`;
                             // }
                             forgotModalMessage.innerHTML = messageText;
+                            startResendCooldown(); // Start the cooldown timer for the resend button
 
                         } else {
-                            displayModalFormErrors(result, forgotPasswordRequestForm, 'forgot');
+                            // Handle different error types
+                            if (response.status === 404) {
+                                // Email not registered - show registration modal
+                                hideCustomModal(forgotPasswordRequestModal);
+                                showFlexibleModal(
+                                    '<p>The email address you entered is not registered yet.</p><p>Please sign up to create an account.</p>',
+                                    [
+                                        { text: 'Sign Up', action: () => {
+                                            signupRadio.checked = true;
+                                            slideToSignup();
+                                            // Pre-fill the email in signup form
+                                            signupEmailInput.value = email;
+                                        }},
+                                        { text: 'Try Again', style: 'background-color: var(--bs-secondary-color);' }
+                                    ]
+                                );
+                            } else {
+                                // Other errors (400, 500) - show in modal
+                                result.status = response.status;
+                                displayModalFormErrors(result, forgotPasswordRequestForm, 'forgot');
+                            }
                         }
                     } catch (error) {
                         console.error('Fetch error:', error);
@@ -1028,19 +1270,17 @@
                 clearErrors('otp'); // Clear errors specific to the OTP verification form
 
                 let isValid = true;
-                const otp = otpInput.value.trim();
+                const otpDigits = document.querySelectorAll('.otp-digit');
+                const otp = Array.from(otpDigits).map(d => d.value).join('');
 
-                if (otp === '') {
+                if (otp.length !== 8 || !/^\d{8}$/.test(otp)) {
                     isValid = false;
-                    otpError.textContent = 'OTP is required.';
-                    otpInput.classList.add('error');
-                } else if (!/^\d{6}$/.test(otp)) { // Ensure it's 6 digits
-                    isValid = false;
-                    otpError.textContent = 'OTP must be a 6-digit number.';
-                    otpInput.classList.add('error');
+                    otpError.textContent = 'Please enter all 8 digits of the OTP.';
+                    otpDigits.forEach(d => d.classList.add('error'));
                 }
 
                 if (isValid) {
+                    otpInput.value = otp; // Set hidden input
                     verifyOtpButton.disabled = true;
                     verifyOtpButton.innerHTML = '<span class="loading-spinner"></span> Verifying...';
 
@@ -1106,6 +1346,7 @@
                         otpInput.value = ''; // Clear previous OTP
                         otpInput.classList.remove('error'); // Clear error state
                         otpError.textContent = ''; // Clear error message
+                        startResendCooldown(); // Start the cooldown timer
                     } else {
                         // If there's an error on resend, display it in the OTP section's error message
                         otpError.textContent = result.message || 'Failed to resend OTP.';
@@ -1131,6 +1372,16 @@
                 forgotPasswordRequestForm.reset();
                 currentForgotEmail = ''; // Clear stored email
                 clearErrors('forgot'); // Ensure all forgot-related errors are cleared
+                // Clear resend cooldown
+                if (resendInterval) {
+                    clearInterval(resendInterval);
+                    resendInterval = null;
+                    resendCooldown = 0;
+                }
+                // Reset resend button styling
+                resendOtpButton.disabled = false;
+                resendOtpButton.textContent = 'Send Code Again';
+                resendOtpButton.style.backgroundColor = '';
             });
         }
 
@@ -1140,6 +1391,16 @@
                 verifyOtpForm.reset();
                 currentForgotEmail = ''; // Clear stored email
                 clearErrors('otp'); // Ensure all OTP-related errors are cleared
+                // Clear resend cooldown
+                if (resendInterval) {
+                    clearInterval(resendInterval);
+                    resendInterval = null;
+                    resendCooldown = 0;
+                }
+                // Reset resend button styling
+                resendOtpButton.disabled = false;
+                resendOtpButton.textContent = 'Send Code Again';
+                resendOtpButton.style.backgroundColor = '';
             });
         }
 
@@ -1149,6 +1410,16 @@
                 resetPasswordForm.reset();
                 currentForgotEmail = ''; // Clear stored email
                 clearErrors('reset'); // Ensure all reset-related errors are cleared
+                // Clear resend cooldown
+                if (resendInterval) {
+                    clearInterval(resendInterval);
+                    resendInterval = null;
+                    resendCooldown = 0;
+                }
+                // Reset resend button styling
+                resendOtpButton.disabled = false;
+                resendOtpButton.textContent = 'Send Code Again';
+                resendOtpButton.style.backgroundColor = '';
             });
         }
 
@@ -1213,6 +1484,16 @@
                             hideCustomModal(resetPasswordModal);
                             resetPasswordForm.reset();
                             currentForgotEmail = ''; // Clear stored email after successful reset
+                            // Clear resend cooldown
+                            if (resendInterval) {
+                                clearInterval(resendInterval);
+                                resendInterval = null;
+                                resendCooldown = 0;
+                            }
+                            // Reset resend button styling
+                            resendOtpButton.disabled = false;
+                            resendOtpButton.textContent = 'Send Code Again';
+                            resendOtpButton.style.backgroundColor = '';
                             showFlexibleModal(
                                 '<p>Password reset successful. You can now login with your new password.</p>',
                                 [{ text: 'OK', action: () => {
@@ -1222,6 +1503,7 @@
                             );
                         } else {
                             // Display error messages from the backend
+                            result.status = response.status;
                             displayModalFormErrors(result, resetPasswordForm, 'reset');
                             if (result.message && (result.message.includes('OTP not verified') || result.message.includes('not initiated'))) {
                                 showFlexibleModal(
@@ -1313,7 +1595,10 @@
             // Update the main message area of the modal if a general message is returned
             const targetModalMessage = formElement.closest('.modal-content').querySelector('.modal-message');
             if (targetModalMessage && result.message) {
-                targetModalMessage.innerHTML = `<p>${result.message}</p>`;
+                // Check if this is an error response (status codes 400-599 indicate errors)
+                const isError = result.status >= 400 && result.status < 600;
+                const messageClass = isError ? 'error-message' : '';
+                targetModalMessage.innerHTML = `<p class="${messageClass}">${result.message}</p>`;
             }
         }
 
@@ -1371,9 +1656,9 @@
                             showFlexibleModal(
                                 '<p>Login successful!</p>',
                                 [{ text: 'OK', action: () => {
-                                    // In a real application, you'd redirect to a dashboard or handle session/token
-                                    alert('Welcome! You are logged in.'); // Simple alert for demonstration
-                                    // window.location.href = '/dashboard'; // Example redirect
+                                    localStorage.setItem('isLoggedIn', 'true');
+                                    localStorage.setItem('user', JSON.stringify(result.user));
+                                    window.location.href = '/';
                                 }}]
                             );
                         }
@@ -1398,10 +1683,13 @@
                             handleMainFormErrors(result, formElement, endpoint);
                         }
                     } else if (formContext === 'forgot') {
+                        result.status = response.status;
                         displayModalFormErrors(result, formElement, 'forgot');
                     } else if (formContext === 'otp') {
+                        result.status = response.status;
                         displayModalFormErrors(result, formElement, 'otp');
                     } else if (formContext === 'reset') {
+                        result.status = response.status;
                         displayModalFormErrors(result, formElement, 'reset');
                     }
                 }
@@ -1419,9 +1707,9 @@
                 submitButton.disabled = false;
                 // Reset button text specifically for modal forms if not handled by success/error flows above
                 if (formContext === 'forgot') {
-                    submitButton.innerHTML = 'Request OTP';
+                    submitButton.innerHTML = 'Send Reset Code';
                 } else if (formContext === 'otp') {
-                    submitButton.innerHTML = 'Verify OTP';
+                    submitButton.innerHTML = 'Verify Code';
                 } else if (formContext === 'reset') {
                     submitButton.innerHTML = 'Reset Password';
                 }

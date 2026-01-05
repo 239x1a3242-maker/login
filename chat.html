@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAKR AI - Chat</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- Define CSS Variables (Copy from homepage or ensure in style.css) --- */
+         :root {
+             /* Default light mode colors (adjust as needed) */
+            --gakr-blue: #4285F4;
+            --gakr-blue-dark: #1a73e8; /* A slightly darker shade for active states */
+            --gakr-blue-light: #e8f0fe; /* A light shade for backgrounds */
+            --gakr-grey-text: #5f6368;
+            --gakr-grey-hover-bg: rgba(95, 99, 104, 0.1); /* Subtle hover for grey icons */
+         }
+
+         :root[data-bs-theme="dark"] {
+             /* Dark mode overrides (adjust based on your bootstrap dark theme vars) */
+            --gakr-blue: #8ab4f8; /* Lighter blue for dark mode */
+            --gakr-blue-dark: #669df6;
+            --gakr-blue-light: rgba(138, 180, 248, 0.1); /* Light blue background with transparency */
+            --gakr-grey-text: #bdc1c6;
+            --gakr-grey-hover-bg: rgba(189, 193, 198, 0.1);
+            /* Ensure --bs-body-bg, --bs-body-color, --bs-border-color etc. are correctly set by bootstrap theme */
+         }
+
+        /* --- Base Chat Layout --- */
+        .gakr-chat-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+             background-color: var(--bs-body-bg); /* Use BS var */
+             color: var(--bs-body-color); /* Use BS var */
+        }
+
+        .gakr-chat-header {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bs-border-color);
+            height: 64px;
+        }
+
+        .gakr-logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .gakr-brand-logo {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gakr-brand-text {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--gakr-blue);
+        }
+
+        .gakr-chat-wrapper {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gakr-chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .gakr-prompt-area {
+            padding: 1rem;
+            border-top: 1px solid var(--bs-border-color);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            /* --- MODIFIED CSS: Add relative positioning for options container --- */
+            position: relative;
+            /* --- END MODIFIED CSS --- */
+        }
+
+        .gakr-message {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 90%;
+        }
+
+        .gakr-message-user {
+            align-self: flex-end;
+        }
+
+        .gakr-message-ai {
+            align-self: flex-start;
+        }
+
+        .gakr-message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--bs-secondary-color);
+        }
+
+        .gakr-message-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .gakr-message-content {
+            padding: 1rem;
+            border-radius: 12px;
+            line-height: 1.5;
+             /* Ensure text wrapping */
+             white-space: pre-wrap;
+             word-break: break-word;
+        }
+
+        .gakr-message-user .gakr-message-content {
+            background-color: var(--bs-tertiary-bg);
+            border-top-right-radius: 4px;
+        }
+
+        .gakr-message-ai .gakr-message-content {
+            background-color: rgba(66, 133, 244, 0.1);
+            border-top-left-radius: 4px;
+        }
+
+        .gakr-message-user .gakr-message-avatar {
+            background-color: var(--bs-tertiary-bg);
+        }
+
+        .gakr-message-ai .gakr-message-avatar {
+            background-color: rgba(66, 133, 244, 0.2);
+            color: var(--gakr-blue);
+        }
+
+        /* --- MODIFIED CSS FOR INPUT/TEXTAREA AND ACTIONS --- */
+        .gakr-input-container {
+            position: relative; /* Keep relative */
+            border-radius: 24px;
+            border: 1px solid var(--bs-border-color);
+            background: var(--bs-body-bg);
+            padding: 0.75rem 1rem; /* Padding around content */
+            display: flex;
+             /* --- MODIFIED: align-items to flex-end for textarea --- */
+            align-items: flex-end;
+             /* --- END MODIFIED --- */
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+             /* Added focus transition from homepage */
+            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            flex-wrap: wrap; /* Allow items to wrap when attachments are added */
+            gap: 0.5rem; /* Space between attachments and input */
+        }
+
+         /* Style when the container or its children are focused */
+        .gakr-input-container:focus-within {
+            border-color: var(--gakr-blue);
+            box-shadow: 0 1px 8px rgba(66, 133, 244, 0.2);
+            background: var(--bs-body-bg);
+        }
+
+        /* Style the textarea (#userInput) */
+        .gakr-input { /* Targets the textarea with id="userInput" */
+            flex: 1; /* Textarea takes available space */
+            border: none;
+            background: transparent;
+             /* --- MODIFIED: Padding adjustment for textarea (removed initial padding to be controlled by JS) --- */
+            padding: 0; /* Changed from 0.5rem 0.5rem */
+            /* Removed fixed height: height: 24px; from previous input styles */
+            /* Removed fixed max-height: 120px; from chat page styles */
+            outline: none;
+            color: var(--bs-body-color);
+            font-size: 1rem; /* Keep font size */
+            resize: none; /* Prevent manual resizing */
+            overflow-y: hidden; /* JS manages this */
+            line-height: 1.4; /* Adjust line height as needed */
+             /* Min/Max height calculation (adjust if 1rem font size differs) */
+            min-height: calc(1rem * 1.4); /* Approx height of 1 line */
+            max-height: calc(1rem * 1.4 * 5); /* Approx max height (5 lines) */
+            box-sizing: border-box; /* Include padding/border in element size */
+            white-space: pre-wrap; /* Ensure text wraps */
+            word-break: break-word; /* Break long words */
+            vertical-align: bottom; /* Align baseline to bottom */
+            transition: height 0.3s ease-in-out; /* Animate height change */
+        }
+
+        .gakr-input:focus {
+             outline: none;
+        }
+
+
+        .gakr-input-actions {
+            display: flex;
+             /* --- MODIFIED: align-items to flex-end for textarea --- */
+            align-items: flex-end;
+             /* --- ADDED: padding-bottom to align icons --- */
+            padding-bottom: 0px; /* Changed from 0.5rem, controlled by JS */
+            /* --- END MODIFIED --- */
+            gap: 0.5rem;
+            font-size: 1.25rem;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+         /* Reusing .gakr-action-button styles for new '+' button */
+         .gakr-action-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--bs-secondary-color); /* Use BS var */
+             /* Added hover/active transitions from homepage */
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+
+        .gakr-action-button:hover {
+            background-color: var(--bs-tertiary-bg); /* Use BS var */
+             color: var(--bs-body-color); /* Darken icon color slightly on hover */
+        }
+
+         .gakr-action-button:active {
+            transform: scale(0.95); /* Slight press effect */
+             background-color: var(--bs-tertiary-bg); /* Keep hover bg on active */
+             color: var(--bs-body-color);
+             transition: background-color 0s, transform 0.1s; /* Make feedback immediate */
+        }
+
+        .gakr-submit-button {
+            color: var(--gakr-blue); /* Use CSS var */
+        }
+
+         /* Specific styles for submit button hover/active */
+         .gakr-submit-button:hover {
+             background-color: var(--gakr-blue-light); /* Light blue background on hover */
+             color: var(--gakr-blue-dark); /* Darker blue icon on hover */
+         }
+
+         .gakr-submit-button:active {
+             transform: scale(0.95); /* Slight press effect */
+              background-color: var(--gakr-blue-light);
+              color: var(--gakr-blue-dark);
+              transition: background-color 0s, transform 0.1s;
+         }
+
+         .gakr-submit-button.disabled {
+            opacity: 0.5;
+            cursor: default;
+            /* Ensure transitions are off when disabled to avoid weird states */
+            transition: none;
+        }
+
+        .gakr-submit-button.disabled:hover {
+            background-color: transparent;
+             color: var(--gakr-blue); /* Keep original color when disabled */
+        }
+        /* --- END MODIFIED CSS --- */
+
+
+        .gakr-typing {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            background-color: rgba(66, 133, 244, 0.1);
+            margin-bottom: 1rem;
+            align-self: flex-end;
+        }
+
+        .gakr-typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--gakr-blue);
+            animation: typing 1.3s infinite ease-in-out;
+        }
+
+        .gakr-typing-dot:nth-child(1) { animation-delay: 0s; }
+        .gakr-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .gakr-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .gakr-thinking-toggle {
+            background: none;
+            border: none;
+            color: var(--gakr-blue);
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 0;
+            margin-bottom: 0.5rem;
+            text-decoration: underline;
+        }
+
+        .gakr-thinking-content {
+            display: block;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: rgba(138, 180, 248, 0.05);
+            border-left: 3px solid var(--gakr-blue);
+            font-style: italic;
+        }
+
+        .gakr-welcome {
+            text-align: center;
+            max-width: 600px;
+            margin: 4rem auto;
+        }
+
+        .gakr-welcome-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--gakr-blue);
+        }
+
+        .gakr-welcome-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        /* Login button styling (from homepage) */
+        .gakr-login-button {
+            color: var(--gakr-blue);
+            text-decoration: none;
+            background: transparent;
+            border: 1px solid var(--gakr-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .gakr-login-button:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+
+        /* Profile button styling */
+        .gakr-profile-button {
+            color: var(--gakr-blue);
+            text-decoration: none;
+            background: transparent;
+            border: 1px solid var(--gakr-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gakr-profile-button:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+
+        /* Login prompt modal (keep existing) */
+        .gakr-login-prompt {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .gakr-login-prompt.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .gakr-login-prompt-content {
+            background-color: var(--bs-body-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .gakr-login-prompt-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: var(--gakr-blue);
+        }
+
+        .gakr-login-prompt-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .gakr-button-primary {
+            background-color: var(--gakr-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .gakr-button-primary:hover {
+            background-color: #3b78e7;
+        }
+
+        .gakr-button-secondary {
+            background-color: transparent;
+            color: var(--gakr-blue);
+            border: 1px solid var(--gakr-blue);
+            padding: 0.75rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .gakr-button-secondary:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+
+        .gakr-button-text {
+            background-color: transparent;
+            color: var(--bs-body-color);
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .gakr-button-text:hover {
+            background-color: var(--bs-tertiary-bg);
+        }
+
+         /* --- NEW CSS for Attachment Options --- */
+         .attachment-options-container {
+             position: absolute;
+             bottom: 100%; /* Position above the input bar */
+             left: 1rem; /* Align with left edge padding of prompt area */
+             transform: translateY(-10px); /* Slight initial lift */
+             z-index: 10; /* Ensure it's above chat messages */
+
+             background-color: var(--bs-body-bg);
+             border: 1px solid var(--bs-border-color);
+             border-radius: 15px;
+             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+             padding: 15px;
+
+             display: flex;
+             gap: 20px;
+             justify-content: flex-start; /* Align options to the left */
+             min-width: max-content;
+
+             opacity: 0;
+             visibility: hidden;
+             pointer-events: none; /* Prevent clicks when hidden */
+
+             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0s linear 0.3s; /* Animate opacity/transform, hide visibility after */
+         }
+
+         /* State when visible */
+         .attachment-options-container.visible {
+             opacity: 1;
+             visibility: visible;
+             pointer-events: auto; /* Allow clicks when visible */
+             transform: translateY(-20px); /* Slight slide up effect */
+             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0s linear 0s; /* Show visibility immediately */
+         }
+
+         .attachment-option {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             cursor: pointer;
+             color: var(--bs-body-color);
+             font-size: 0.8rem;
+             gap: 5px;
+             transition: color 0.2s ease-in-out;
+         }
+
+         .attachment-option:hover {
+             color: var(--gakr-blue);
+         }
+
+         .attachment-icon {
+             width: 48px;
+             height: 48px;
+             border-radius: 50%;
+             background-color: var(--bs-tertiary-bg);
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 1.2rem;
+             transition: background-color 0.2s ease-in-out;
+         }
+
+         .attachment-option:hover .attachment-icon {
+             background-color: var(--gakr-blue-light);
+         }
+
+         .attachment-text {
+             text-align: center;
+         }
+
+         /* Styles for attached file chips */
+         .attached-file-preview-container {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 8px;
+             /* Removed padding-bottom from here, handled by JS setting padding-top on textarea */
+             width: 100%; /* Take full width of parent container */
+         }
+
+         .attached-file-chip {
+             display: flex;
+             align-items: center;
+             background-color: var(--bs-tertiary-bg);
+             border-radius: 16px;
+             padding: 4px 8px;
+             font-size: 0.85rem;
+             color: var(--bs-body-color);
+             max-width: 150px; /* Limit chip width */
+             overflow: hidden;
+             text-overflow: ellipsis;
+             white-space: nowrap;
+             position: relative; /* For the close button */
+         }
+
+         .attached-file-chip .file-name {
+             flex-grow: 1;
+             overflow: hidden;
+             text-overflow: ellipsis;
+             white-space: nowrap;
+             padding-right: 8px; /* Space for close button */
+         }
+
+         .attached-file-chip .remove-file {
+             cursor: pointer;
+             margin-left: 4px;
+             color: var(--bs-secondary-color);
+         }
+
+         .attached-file-chip .remove-file:hover {
+             color: var(--bs-body-color);
+         }
+
+         .attached-file-chip img {
+             width: 24px;
+             height: 24px;
+             border-radius: 4px;
+             object-fit: cover;
+             margin-right: 8px;
+         }
+
+         /* Hide file inputs */
+         .hidden-file-input {
+             display: none;
+         }
+
+
+         /* --- END NEW CSS --- */
+
+    </style>
+</head>
+<body>
+    <div class="gakr-chat-layout">
+        <header class="gakr-chat-header">
+            <div class="gakr-logo-area">
+                <a href="/" class="gakr-brand-logo">
+                    <i class="fas fa-robot" style="color: var(--gakr-blue);"></i>
+                </a>
+                <a href="/" class="gakr-brand-text" style="text-decoration: none;">GAKR AI</a>
+            </div>
+
+            <div class="gakr-nav-controls">
+                <a href="/auth" class="gakr-login-button">Sign in / Register</a>
+            </div>
+        </header>
+
+        <div class="gakr-chat-wrapper">
+            <div class="gakr-chat-container" id="chatContainer">
+                <div class="gakr-welcome" id="welcomeMessage">
+                    <div class="gakr-welcome-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h1 class="gakr-welcome-title">How can I help you today?</h1>
+                    <p>I'm GAKR AI, your AI assistant. Ask me anything!</p>
+                </div>
+
+                <div class="gakr-message gakr-message-ai d-none" id="initialMessage">
+                    <div class="gakr-message-header">
+                        <div class="gakr-message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <span>GAKR AI</span>
+                    </div>
+                    <div class="gakr-message-content">Hello! I'm GAKR AI How can I help you today?
+                    </div>
+                </div>
+
+                <div class="gakr-typing d-none" id="typingIndicator">
+                    <div class="gakr-typing-dot"></div>
+                    <div class="gakr-typing-dot"></div>
+                    <div class="gakr-typing-dot"></div>
+                </div>
+            </div>
+
+            <div class="gakr-prompt-area">
+                <div class="gakr-input-container" id="inputContainer">
+                    <div class="gakr-action-button" id="addButton">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="attached-file-preview-container" id="attachedFilePreviewContainer">
+                    </div>
+                    <textarea class="gakr-input" id="userInput" placeholder="Message GAKR AI..." rows="1"></textarea>
+
+                    <div class="gakr-input-actions">
+                        <div class="gakr-action-button">
+                            <i class="fas fa-microphone"></i>
+                        </div>
+                        <div class="gakr-action-button gakr-submit-button disabled" id="submitButton">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="attachment-options-container">
+                    <div class="attachment-option" id="cameraOption">
+                        <div class="attachment-icon"><i class="fas fa-camera"></i></div>
+                        <div class="attachment-text">Camera</div>
+                        <input type="file" id="cameraInput" class="hidden-file-input" accept="image/*" capture="camera">
+                    </div>
+                    <div class="attachment-option" id="galleryOption">
+                        <div class="attachment-icon"><i class="fas fa-image"></i></div>
+                        <div class="attachment-text">Gallery</div>
+                        <input type="file" id="galleryInput" class="hidden-file-input" accept="image/*">
+                    </div>
+                    <div class="attachment-option" id="filesOption">
+                        <div class="attachment-icon"><i class="fas fa-paperclip"></i></div>
+                        <div class="attachment-text">Files</div>
+                        <input type="file" id="filesInput" class="hidden-file-input" accept="*/*">
+                    </div>
+                     <div class="attachment-option" id="driveOption">
+                        <div class="attachment-icon"><i class="fab fa-google-drive"></i></div>
+                        <div class="attachment-text">Drive</div>
+                    </div>
+                </div>
+                 </div>
+        </div>
+
+        <div class="gakr-login-prompt" id="loginPrompt">
+            <div class="gakr-login-prompt-content">
+                <div class="gakr-login-prompt-title">Continue with GAKR AI</div>
+                <p>You've had 5 conversations with GAKR AI. Would you like to create an account to save your history?</p>
+                <div class="gakr-login-prompt-buttons">
+                    <a href="login.html" class="gakr-button-primary">Sign in / Register</a>
+                    <a href="/login?signup=true" class="gakr-button-secondary">Create account</a>
+                    <button type="button" class="gakr-button-text" id="continueGuest">Continue as guest</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatContainer = document.getElementById('chatContainer');
+    const userInput = document.getElementById('userInput'); // textarea
+    const submitButton = document.getElementById('submitButton');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    const initialMessage = document.getElementById('initialMessage');
+    const loginPrompt = document.getElementById('loginPrompt');
+    const continueGuest = document.getElementById('continueGuest');
+
+    const addButton = document.getElementById('addButton');
+    const attachmentOptionsContainer = document.querySelector('.attachment-options-container');
+
+    const cameraInput = document.getElementById('cameraInput');
+    const galleryInput = document.getElementById('galleryInput');
+    const filesInput = document.getElementById('filesInput');
+    const attachedFilePreviewContainer = document.getElementById('attachedFilePreviewContainer');
+    const inputContainer = document.getElementById('inputContainer');
+
+    let messageCount = 0;
+    let attachedFiles = [];
+
+    // Simple login flag (set in auth flow: localStorage.setItem("isLoggedIn","true"))
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+    // Update header based on login status
+    updateHeader();
+
+    function updateHeader() {
+        const navControls = document.querySelector('.gakr-nav-controls');
+        if (isLoggedIn) {
+            navControls.innerHTML = '<a href="/profile" class="gakr-profile-button"><i class="fas fa-user"></i> Profile</a>';
+        } else {
+            navControls.innerHTML = '<a href="/auth" class="gakr-login-button">Sign in / Register</a>';
+        }
+    }
+
+    // --- Textarea Auto-Grow & Scroll Logic (original, kept) ---
+    const style = getComputedStyle(userInput);
+    const lineHeight = parseFloat(style.lineHeight);
+    const minHeight = lineHeight;
+    const maxHeight = lineHeight * 5;
+
+    const initialInputContainerPaddingTop = parseFloat(getComputedStyle(inputContainer).paddingTop);
+    const initialInputContainerPaddingBottom = parseFloat(getComputedStyle(inputContainer).paddingBottom);
+    const initialActionButtonsHeight = document.querySelector('.gakr-input-actions').offsetHeight;
+
+    function autoGrowTextarea() {
+        if (!userInput) {
+            console.error("autoGrowTextarea called but userInput element not found.");
+            return;
+        }
+
+        userInput.style.height = 'auto';
+        const scrollHeight = userInput.scrollHeight;
+
+        let newTextareaHeight = Math.min(Math.max(scrollHeight, minHeight), maxHeight);
+        userInput.style.height = newTextareaHeight + 'px';
+
+        if (attachedFiles.length > 0) {
+            userInput.style.paddingTop = '0px';
+            userInput.style.paddingBottom = '0px';
+            inputContainer.style.alignItems = 'flex-start';
+        } else {
+            userInput.style.paddingTop = '0px';
+            userInput.style.paddingBottom = '0px';
+            inputContainer.style.alignItems = 'flex-end';
+        }
+
+        if (scrollHeight > maxHeight) {
+            userInput.style.overflowY = 'auto';
+        } else {
+            userInput.style.overflowY = 'hidden';
+        }
+
+        // Prompt is required; files alone cannot send
+        if (userInput.value.trim().length > 0) {
+            submitButton.classList.remove('disabled');
+        } else {
+            submitButton.classList.add('disabled');
+        }
+    }
+
+    userInput.addEventListener('input', autoGrowTextarea);
+    setTimeout(autoGrowTextarea, 0);
+    // --- End Textarea Auto-Grow & Scroll Logic ---
+
+
+    // Handle Enter key for sending (Shift+Enter = newline)
+    userInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey && !submitButton.classList.contains('disabled')) {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // Handle submit button click
+    submitButton.addEventListener('click', function() {
+        if (!this.classList.contains('disabled')) {
+            sendMessage();
+        }
+    });
+
+    // Handle microphone button click
+    const microphoneButton = document.querySelector('.gakr-input-actions .gakr-action-button:first-child');
+    if (microphoneButton) {
+        microphoneButton.addEventListener('click', function() {
+            alert('Voice input feature is currently in development.');
+        });
+    }
+
+    // Existing “continue as guest” modal
+    continueGuest.addEventListener('click', function() {
+        loginPrompt.classList.remove('show');
+    });
+
+    // --- Handle Add Button Click ---
+    addButton.addEventListener('click', function(event) {
+        event.stopPropagation();
+        attachmentOptionsContainer.classList.toggle('visible');
+    });
+
+    // --- Attachment Options ---
+    document.getElementById('cameraOption').addEventListener('click', function() {
+        cameraInput.click();
+        attachmentOptionsContainer.classList.remove('visible');
+    });
+
+    document.getElementById('galleryOption').addEventListener('click', function() {
+        galleryInput.click();
+        attachmentOptionsContainer.classList.remove('visible');
+    });
+
+    document.getElementById('filesOption').addEventListener('click', function() {
+        filesInput.click();
+        attachmentOptionsContainer.classList.remove('visible');
+    });
+
+    document.getElementById('driveOption').addEventListener('click', function() {
+        alert("Google Drive integration requires backend setup and Google API access.");
+        attachmentOptionsContainer.classList.remove('visible');
+    });
+
+    // --- File input change (camera/gallery/files) ---
+    [cameraInput, galleryInput, filesInput].forEach(input => {
+        input.addEventListener('change', function(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    attachedFiles.push(files[i]);
+                    addFileChip(files[i]);
+                }
+                autoGrowTextarea();
+                userInput.focus();
+            }
+            event.target.value = '';
+        });
+    });
+
+    function addFileChip(file) {
+        const chip = document.createElement('div');
+        chip.className = 'attached-file-chip';
+        chip.setAttribute('data-filename', file.name);
+
+        let previewElement;
+        if (file.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.alt = file.name;
+            img.onload = () => URL.revokeObjectURL(img.src);
+            previewElement = img;
+        } else {
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-paperclip';
+            previewElement = icon;
+        }
+
+        const fileNameSpan = document.createElement('span');
+        fileNameSpan.className = 'file-name';
+        fileNameSpan.textContent = file.name;
+
+        const removeButton = document.createElement('span');
+        removeButton.className = 'remove-file';
+        removeButton.innerHTML = '&times;';
+        removeButton.addEventListener('click', function() {
+            removeFileChip(file.name);
+        });
+
+        chip.appendChild(previewElement);
+        chip.appendChild(fileNameSpan);
+        chip.appendChild(removeButton);
+
+        attachedFilePreviewContainer.appendChild(chip);
+        autoGrowTextarea();
+    }
+
+    function removeFileChip(filename) {
+        const chipToRemove = attachedFilePreviewContainer.querySelector(`[data-filename="${filename}"]`);
+        if (chipToRemove) {
+            attachedFilePreviewContainer.removeChild(chipToRemove);
+            attachedFiles = attachedFiles.filter(file => file.name !== filename);
+            autoGrowTextarea();
+        }
+    }
+
+    // Hide attachment options when clicking outside
+    document.addEventListener('click', function(event) {
+        const isClickInsideAddButton = addButton && addButton.contains(event.target);
+        const isClickInsideOptions = attachmentOptionsContainer && attachmentOptionsContainer.contains(event.target);
+
+        if (attachmentOptionsContainer && attachmentOptionsContainer.classList.contains('visible') && !isClickInsideAddButton && !isClickInsideOptions) {
+            attachmentOptionsContainer.classList.remove('visible');
+        }
+    });
+
+    if (attachmentOptionsContainer) {
+        attachmentOptionsContainer.addEventListener('click', function(event){
+            event.stopPropagation();
+        });
+    }
+
+    // --- Centered login reminder mini-window ---
+    let inlineLoginPromptShown = false;
+    function maybeShowInlineLoginPrompt() {
+        if (isLoggedIn) return;
+        if (inlineLoginPromptShown) return;
+        if (messageCount % 5 !== 0) return;
+
+        inlineLoginPromptShown = true;
+
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.inset = '0';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.35)';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.zIndex = '9999';
+
+        const card = document.createElement('div');
+        card.style.width = '100%';
+        card.style.maxWidth = '420px';
+        card.style.borderRadius = '16px';
+        card.style.backgroundColor = 'var(--bs-body-bg)';
+        card.style.border = '1px solid var(--bs-border-color)';
+        card.style.boxShadow = '0 16px 40px rgba(0,0,0,0.25)';
+        card.style.padding = '1.25rem 1.5rem';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.gap = '0.75rem';
+
+        const title = document.createElement('div');
+        title.textContent = "Save your conversations";
+        title.style.fontWeight = '600';
+        title.style.fontSize = '1rem';
+
+        const text = document.createElement('div');
+        text.textContent = "Log in to keep your chat history across devices. If you continue as a guest, your conversations may be lost later.";
+        text.style.fontSize = '0.9rem';
+        text.style.opacity = '0.9';
+
+        const buttonRow = document.createElement('div');
+        buttonRow.style.display = 'flex';
+        buttonRow.style.gap = '0.75rem';
+        buttonRow.style.marginTop = '0.5rem';
+
+        const skipBtn = document.createElement('button');
+        skipBtn.textContent = "Continue without login";
+        skipBtn.style.flex = '1';
+        skipBtn.style.borderRadius = '999px';
+        skipBtn.style.border = '1px solid var(--bs-border-color)';
+        skipBtn.style.backgroundColor = 'transparent';
+        skipBtn.style.color = 'var(--bs-body-color)';
+        skipBtn.style.padding = '0.5rem 0.75rem';
+        skipBtn.style.fontSize = '0.85rem';
+        skipBtn.style.cursor = 'pointer';
+
+        const loginBtn = document.createElement('button');
+        loginBtn.textContent = "Log in to save chats";
+        loginBtn.style.flex = '1';
+        loginBtn.style.borderRadius = '999px';
+        loginBtn.style.border = 'none';
+        loginBtn.style.backgroundColor = 'var(--gakr-blue)';
+        loginBtn.style.color = '#fff';
+        loginBtn.style.padding = '0.5rem 0.75rem';
+        loginBtn.style.fontSize = '0.85rem';
+        loginBtn.style.cursor = 'pointer';
+
+        skipBtn.addEventListener('click', function () {
+            overlay.remove();
+        });
+
+        loginBtn.addEventListener('click', function () {
+            window.location.href = '/auth';
+        });
+
+        buttonRow.appendChild(skipBtn);
+        buttonRow.appendChild(loginBtn);
+        card.appendChild(title);
+        card.appendChild(text);
+        card.appendChild(buttonRow);
+        overlay.appendChild(card);
+        document.body.appendChild(overlay);
+    }
+
+    // --- sendMessage: prompt required, files optional, generic error ---
+    async function sendMessage() {
+        const text = userInput.value.trim();
+
+        // Prompt is required; files alone cannot be sent
+        if (!text) {
+            return;
+        }
+
+        if (!welcomeMessage.classList.contains('d-none')) {
+            welcomeMessage.classList.add('d-none');
+        }
+
+        if (initialMessage.classList.contains('d-none')) {
+            initialMessage.classList.remove('d-none');
+        }
+
+        const filesSnapshot = [...attachedFiles];
+
+        let userMessageContent = text;
+        if (filesSnapshot.length > 0) {
+            const fileNames = filesSnapshot.map(f => f.name).join(', ');
+            userMessageContent += ` (Attached: ${fileNames})`;
+        }
+        addMessage(userMessageContent, 'user');
+        messageCount++;
+
+        userInput.value = '';
+        attachedFiles = [];
+        attachedFilePreviewContainer.innerHTML = '';
+        autoGrowTextarea();
+        userInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+        typingIndicator.classList.remove('d-none');
+        scrollToBottom();
+
+        const formData = new FormData();
+        
+        formData.append('prompt', text);
+
+        if (filesSnapshot.length > 0) {
+            filesSnapshot.forEach((file) => {
+                formData.append('files', file);
+            });
+        }
+
+        try {
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                typingIndicator.classList.add('d-none');
+                addMessage('There was a server issue. Please try again later.', 'ai');
+                return;
+            }
+
+            // Create AI message div first
+            const aiMessageDiv = addMessage('', 'ai', true); // true for streaming
+            let accumulatedText = '';
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+                accumulatedText += chunk;
+                updateAIMessage(aiMessageDiv, accumulatedText);
+            }
+
+            if (messageCount > 0 && messageCount % 5 === 0) {
+                maybeShowInlineLoginPrompt();
+            }
+        } catch (error) {
+            console.error('Fetch Error:', error);
+            typingIndicator.classList.add('d-none');
+            addMessage('There was a server issue. Please try again later.', 'ai');
+        } finally {
+            if (typingIndicator) {
+                typingIndicator.classList.add('d-none');
+            }
+            scrollToBottom();
+        }
+    }
+
+    function addMessage(text, type, streaming = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `gakr-message gakr-message-${type}`;
+
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'gakr-message-header';
+
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'gakr-message-avatar';
+
+        const avatarIcon = document.createElement('i');
+        avatarIcon.className = type === 'user' ? 'fas fa-user' : 'fas fa-robot';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = type === 'user' ? 'You' : 'GAKR AI';
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'gakr-message-content';
+        if (!streaming) {
+            if (type === 'ai') {
+                updateAIMessage(contentDiv, text);
+            } else {
+                contentDiv.textContent = text;
+            }
+        }
+
+        avatarDiv.appendChild(avatarIcon);
+        headerDiv.appendChild(avatarDiv);
+        headerDiv.appendChild(nameSpan);
+
+        messageDiv.appendChild(headerDiv);
+        messageDiv.appendChild(contentDiv);
+
+        chatContainer.appendChild(messageDiv);
+
+        if (!streaming) {
+            scrollToBottom();
+        }
+
+        return streaming ? contentDiv : null;
+    }
+
+    function updateAIMessage(contentDiv, text) {
+        // Clear previous content
+        contentDiv.innerHTML = '';
+
+        const thinkStart = text.indexOf('<think>');
+        const thinkEnd = text.indexOf('</think>');
+        if (thinkStart !== -1 && thinkEnd !== -1 && thinkEnd > thinkStart) {
+            const thinking = text.substring(thinkStart + 7, thinkEnd).trim();
+            const solution = text.substring(thinkEnd + 8).trim();
+
+            // Create toggle button
+            const toggleButton = document.createElement('button');
+            toggleButton.className = 'gakr-thinking-toggle';
+            toggleButton.textContent = 'hide thinking';
+            toggleButton.onclick = function() {
+                const thinkingDiv = this.nextElementSibling;
+                if (thinkingDiv.style.display === 'none') {
+                    thinkingDiv.style.display = 'block';
+                    this.textContent = 'hide thinking';
+                } else {
+                    thinkingDiv.style.display = 'none';
+                    this.textContent = 'show thinking';
+                }
+            };
+
+            // Create thinking content div
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.className = 'gakr-thinking-content';
+            thinkingDiv.textContent = thinking;
+
+            contentDiv.appendChild(toggleButton);
+            contentDiv.appendChild(thinkingDiv);
+            contentDiv.appendChild(document.createTextNode(solution));
+        } else {
+            contentDiv.textContent = text;
+        }
+    }
+
+    function scrollToBottom() {
+        setTimeout(() => {
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }, 0);
+    }
+
+    // Initialize from URL ?q=...
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQuery = urlParams.get('q');
+
+    if (initialQuery) {
+        userInput.value = initialQuery;
+        userInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+        setTimeout(function() {
+            if (submitButton && !submitButton.classList.contains('disabled')) {
+                submitButton.click();
+            }
+        }, 100);
+    } else {
+        if (userInput) {
+            if (userInput.value.trim().length === 0 && attachedFiles.length === 0) {
+                if (submitButton) submitButton.classList.add('disabled');
+            } else {
+                if (submitButton) submitButton.classList.remove('disabled');
+            }
+            autoGrowTextarea();
+        }
+    }
+});
+</script>
+
+
+
+</body>
+</html>
