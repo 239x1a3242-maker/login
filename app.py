@@ -17,7 +17,7 @@ limiter = Limiter(app=app, key_func=get_remote_address, default_limits=[])
 
 # --- Email Config (Gmail SMTP) ---
 SMTP_EMAIL = 'rn8711399@gmail.com'
-SMTP_PASSWORD = 'govcgmwspnbtpdwk'  # Gmail App Password
+SMTP_PASSWORD = 'your token here'  # Gmail App Password
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 
